@@ -2,14 +2,12 @@ import dotenv from "dotenv";
 import { app } from "./app.js";
 import connectDB from "./db/index.js";
 
+dotenv.config();
+
 connectDB();
 
-dotenv.config({
-  path: "./.env",
-});
 
-//console.log(process.env.PORT);
 
-app.listen(8001, () => {
+app.listen(process.env.PORT, () => {
   console.log("Server is listening....");
 });
