@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { loginUser, registerUser } from "../controllers/user.controllers.js";
+import {
+	loginUser,
+	logoutUser,
+	registerUser,
+} from "../controllers/user.controllers.js";
 import { verifyJWT } from "../middlewares/auth.middlewares.js";
 import { User } from "../models/user.models.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
@@ -15,5 +19,7 @@ router.route("/verifyUser").get(verifyJWT, (req, res) => {
 		new ApiResponse(200, req.user, "JWT middleware verified")
 	);
 });
+
+router.route("/logout").get(verifyJWT, logoutUser);
 
 export default router;
