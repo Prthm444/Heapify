@@ -142,4 +142,44 @@ const logoutUser = asyncHandler(async (req, res) => {
 		.json(new ApiResponse(200, {}, "User logged Out"));
 });
 
-export { registerUser, loginUser, logoutUser };
+const getCurrentUserInfo = asyncHandler(async (req, res) => {
+	if (!req.user) {
+		throw new ApiError(404, "Current user info not found");
+	}
+
+	res.status(201).json(
+		new ApiResponse(
+			201,
+			req.user,
+			"Current user info received successfully"
+		)
+	);
+});
+
+const getUserByUsername = asyncHandler(async (req, res) => {
+	const username = req.params.username?.toLowerCase();
+
+	if (!username) {
+		throw new ApiError(400, "Username parameter is missing");
+	}
+
+	const user = await User.findOne({ username });
+
+	if (!user) {
+		throw new ApiError(
+			404,
+			`Couldn't find user with username: ${username}`
+		);
+	}
+
+	res.status(200).json(
+		new ApiResponse(200, user, "User found successfully")
+	);
+});
+export {
+	registerUser,
+	loginUser,
+	logoutUser,
+	getCurrentUserInfo,
+	getUserByUsername,
+};

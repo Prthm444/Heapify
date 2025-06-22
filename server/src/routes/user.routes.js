@@ -1,5 +1,7 @@
 import { Router } from "express";
 import {
+	getUserByUsername,
+	getCurrentUserInfo,
 	loginUser,
 	logoutUser,
 	registerUser,
@@ -7,6 +9,8 @@ import {
 import { verifyJWT } from "../middlewares/auth.middlewares.js";
 import { User } from "../models/user.models.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
+
+
 
 const router = Router();
 
@@ -21,5 +25,9 @@ router.route("/verifyUser").get(verifyJWT, (req, res) => {
 });
 
 router.route("/logout").get(verifyJWT, logoutUser);
+
+router.route("/info").get(verifyJWT, getCurrentUserInfo);
+
+router.route("/userinfo/:username").get(getUserByUsername);
 
 export default router;

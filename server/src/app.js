@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 //import { registerUser,loginUser } from "./controllers/user.controllers.js";
 import UserRouter from "./routes/user.routes.js";
 import ProblemRouter from "./routes/problem.routes.js";
+import friendRequestRouter from "./routes/friendRequest.routes.js";
 const app = express();
 
 app.use(
@@ -23,11 +24,10 @@ app.get("/heapify/test", (req, res) => {
 	res.status(200).send("hii from server, I am alive btw");
 });
 
-
-
 // TODO routing
 
 app.use("/user", UserRouter);
-app.use("/problems",ProblemRouter);
+app.use("/problems", ProblemRouter);
+app.use("/friendrequests", friendRequestRouter);
 
 export { app };
