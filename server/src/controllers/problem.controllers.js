@@ -91,3 +91,25 @@ export const ListProblems = asyncHandler(async (req, res) => {
 			)
 		);
 });
+
+
+export const getAllInputsAndOutputs = asyncHandler(async (req,res) => {
+    const problemId=req.params.problemId;
+	const problem = await Problem.findById(problemId);
+
+	if (!problem) {
+		throw new ApiError(404,"Problem not found");
+	}
+
+	//console.log("problem found ", problem);
+
+	// Extract only input-output pairs
+	const ioPairs = problem.testCases.map((tc) => ({
+		input: tc.input,
+		output: tc.output,
+	}));
+
+	//console.log("returing ", ioPairs);
+
+	res.status(200).json({ioPairs})
+});

@@ -86,8 +86,10 @@ export const acceptFriendRequest = asyncHandler(async (req, res) => {
 	const request = await FriendRequest.findById(requestId);
 	if (!request || request.status === "Rejected")
 		throw new ApiError(401, "cannot find request");
-	if (request.fromUserId !== req.user._id)
+	console.log(request.toUserId, " ----- ", req.user._id);
+	if (request.toUserId.toString() !== req.user._id.toString()) {
 		throw new ApiError(401, "Request not authorized");
+	}
 	if (request.status === "Accepted")
 		throw new ApiError(401, "request already accepted");
 
@@ -149,4 +151,41 @@ export const rejectFriendRequest = asyncHandler(async (req, res) => {
 	await request.deleteOne();
 
 	res.status(200).json(new ApiResponse(200, "Friend Request rejected"));
+});
+
+export const getStatus = asyncHandler(async (req, res) => {
+	const userUsername = req.params.username.toLowerCase();
+	const user = await User.findOne({ username: userUsername });
+
+	if (!user) throw new ApiError(404, "User not found");
+
+	const existingFriend = await User.exists({
+		_id: req.user._id,
+		friends: user._id,
+	});
+	//console.log(existingFriend ? true : false);
+	if (existingFriend) {
+		res.status(200).json(new ApiResponse(200, "Accpeted"));
+	}
+
+	const requestSent = await FriendRequest.findOne({
+		fromUserId: req.user._id,
+		toUserId: user._id,
+		status: "Pending",
+	});
+	console.log(requestSent);
+	if (requestSent) {
+		res.status(200).json(new ApiResponse(200, "Request Sent"));
+	}
+
+	const requestReceived = await FriendRequest.findOne({
+		toUserId: req.user._id,
+		fromUserId: user._id,
+		status: "Pending",
+	});
+	if (requestReceived) {
+		res.status(200).json(new ApiResponse(200, "Request received"));
+	}
+
+	res.status(200).json(new ApiResponse(200, "not friends"));
 });

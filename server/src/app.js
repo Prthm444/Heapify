@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import UserRouter from "./routes/user.routes.js";
 import ProblemRouter from "./routes/problem.routes.js";
 import friendRequestRouter from "./routes/friendRequest.routes.js";
+import SubmissionRouter from "./routes/submission.routes.js";
 const app = express();
 
 app.use(
@@ -29,5 +30,5 @@ app.get("/heapify/test", (req, res) => {
 app.use("/user", UserRouter);
 app.use("/problems", ProblemRouter);
 app.use("/friendrequests", friendRequestRouter);
-
+app.use("/submissions",SubmissionRouter);
 export { app };
