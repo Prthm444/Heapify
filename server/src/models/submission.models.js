@@ -1,5 +1,29 @@
 import mongoose from "mongoose";
 
+const resultSchema = new mongoose.Schema({
+	input: {
+		type: String,
+		required: true,
+	},
+	expectedOutput: {
+		type: String,
+		required: true,
+	},
+	actualOutput: {
+		type: String,
+		required: true,
+	},
+	status: {
+		type: String,
+		enum: ["Passed", "Failed", "Error"],
+		required: true,
+	},
+	executionTime: {
+		type: Number, // in milliseconds
+		required: true,
+	},
+});
+
 const submissionSchema = new mongoose.Schema(
 	{
 		userId: {
@@ -23,13 +47,10 @@ const submissionSchema = new mongoose.Schema(
 		},
 		status: {
 			type: String,
-			enum: ["AC", "WA", "TLE", "RE", "CE", "Pending"],
+			enum: ["AC", "RJ", "TLE", "RE", "CE", "Pending"],
 			default: "Pending",
 		},
-		output: {
-			type: String,
-			default: "",
-		},
+		result: [resultSchema],
 		executionTime: {
 			type: String,
 			default: "",

@@ -5,6 +5,6 @@ import { AddNewSubmission } from "../controllers/submission.controllers.js";
 
 const router=Router();
 
-router.route("/new").post(AddNewSubmission)
+router.route("/new").post(verifyJWT,AddNewSubmission)
 
 export default router;

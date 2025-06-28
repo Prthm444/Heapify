@@ -1,4 +1,4 @@
-import express from "express";
+import express, { urlencoded } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 //import { registerUser,loginUser } from "./controllers/user.controllers.js";
@@ -14,7 +14,7 @@ app.use(
 		credentials: true,
 	})
 );
-
+app.use(express.urlencoded({ extended: true }));
 //middlewares
 app.use(express.json({ limit: "16kb" })); // limiting payload for preventing large payloads incase of DOS attacks
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
@@ -30,5 +30,5 @@ app.get("/heapify/test", (req, res) => {
 app.use("/user", UserRouter);
 app.use("/problems", ProblemRouter);
 app.use("/friendrequests", friendRequestRouter);
-app.use("/submissions",SubmissionRouter);
+app.use("/submissions", SubmissionRouter);
 export { app };

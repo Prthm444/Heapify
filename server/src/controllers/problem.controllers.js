@@ -74,7 +74,7 @@ export const AddNewProblem = asyncHandler(async (req, res) => {
 
 export const ListProblems = asyncHandler(async (req, res) => {
 	const problems = await Problem.find({});
-    console.log("user is :" ,req.user);
+	console.log("user is :", req.user);
 	if (!problems) {
 		return res
 			.status(201)
@@ -92,24 +92,19 @@ export const ListProblems = asyncHandler(async (req, res) => {
 		);
 });
 
-
-export const getAllInputsAndOutputs = asyncHandler(async (req,res) => {
-    const problemId=req.params.problemId;
+export const getInputOutputPairsByProblemId = async (problemId) => {
 	const problem = await Problem.findById(problemId);
-
 	if (!problem) {
-		throw new ApiError(404,"Problem not found");
+		throw new ApiError(404, "Problem not found");
 	}
-
-	//console.log("problem found ", problem);
-
-	// Extract only input-output pairs
-	const ioPairs = problem.testCases.map((tc) => ({
+	return problem.testCases.map((tc) => ({
 		input: tc.input,
 		output: tc.output,
 	}));
+};
 
-	//console.log("returing ", ioPairs);
-
-	res.status(200).json({ioPairs})
+export const getAllInputsAndOutputs = asyncHandler(async (req, res) => {
+	const problemId = req.params.problemId;
+	const ioPairs = await getInputOutputPairsByProblemId(problemId);
+	res.status(200).json({ ioPairs });
 });

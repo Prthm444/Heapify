@@ -31,40 +31,27 @@ app.get("/", (req, res) => {
 	res.json({ online: "compiler" });
 });
 
-app.post("/run/:id", async (req, res) => {
-	// const language = req.body.language;
-	// const code = req.body.code;
-
-	const problemId = req.params.id;
-	const { language = "cpp", code } = req.body;
+app.post("/run", async (req, res) => {
+	const { language = "cpp", code, testcases } = req.body;
 	if (code === undefined) {
 		return res.status(404).json({ success: false, error: "Empty code!" });
 	}
 	try {
 		const filePath = generateFile(language, code);
 		// Authenticate with the main server (replace with proper token-based auth in production)
-		await axios.post(
-			"http://127.0.0.1:8001/user/login",
-			{
-				username: process.env.MAIN_SERVER_USERNAME,
-				password: process.env.MAIN_SERVER_PASSWORD,
-			},
-			{
-				withCredentials: true,
-			}
-		);
 
-		const output = await runCppAgainstTestCases(filePath, problemId);
-		//console.log(output);
-		const submissionResponse = await axios.post(
-			"http://127.0.0.1:8001/submissions/new",
-			{ output:output }
+		const { results, verdict } = await runCppAgainstTestCases(
+			filePath,
+			testcases
 		);
-		console.log(submissionResponse.data);
+		//console.log(output);
+
 		//console.log("output is : ", output);
-		res.json({ output });
+		res.json({ results, verdict });
 	} catch (error) {
-		res.status(500).json({ error: error });
+		res.status(500).json({
+			error: error.message || error.stderr || error,
+		});
 	}
 });
 
