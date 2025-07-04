@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+:root {
+	/* color-scheme: light dark;
+	color: rgba(255, 255, 255, 0.87);
+	background-color: #242424; */
+}
+
+body {
+	margin: 0;
+	/* display: flex;
+	place-items: center; */
+	width: 100%;
+	height: 100%;
+}

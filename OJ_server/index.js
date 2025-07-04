@@ -8,7 +8,7 @@ const axios = require("axios");
 const app = express();
 
 dotenv.config();
-connectDB();
+//connectDB();
 /**
  * Entry point for the Express server.
  *
@@ -40,10 +40,7 @@ app.post("/run", async (req, res) => {
 		const filePath = generateFile(language, code);
 		// Authenticate with the main server (replace with proper token-based auth in production)
 
-		const { results, verdict } = await runCppAgainstTestCases(
-			filePath,
-			testcases
-		);
+		const { results, verdict } = await runCppAgainstTestCases(filePath, testcases);
 		//console.log(output);
 
 		//console.log("output is : ", output);
