@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+
 const ProblemPage = () => {
+	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+
+	if (!isLoggedIn) return <Navigate to="/login" replace />;
+
 	const [problems, setProblems] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -9,7 +16,7 @@ const ProblemPage = () => {
 	useEffect(() => {
 		const fetchProblems = async () => {
 			try {
-				const res = await axios.get("http://localhost:8001/problems/list");
+				const res = await axios.get("http://localhost:8001/problems/list", { withCredentials: true });
 				setProblems(res.data.data);
 			} catch (err) {
 				console.error(err);

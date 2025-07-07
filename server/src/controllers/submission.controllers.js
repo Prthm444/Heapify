@@ -4,7 +4,7 @@ import { asyncHandler } from "../utils/async.utils.js";
 import axios from "axios";
 import { getInputOutputPairsByProblemId } from "./problem.controllers.js";
 import Problem from "../models/problem.models.js";
-
+import { User } from "../models/user.models.js";
 
 export const AddNewSubmission = asyncHandler(async (req, res) => {
 	const { language = "cpp", code, problemId } = req.body;
@@ -31,5 +31,30 @@ export const AddNewSubmission = asyncHandler(async (req, res) => {
 	if (!newSubmission) {
 		throw new ApiError(500, "Could not submit to database");
 	}
+
+	// Update user's stats
+	const updateOps = {
+		$addToSet: {
+			"stats.Submissions": submission._id,
+			"stats.languagesUsed": language,
+		},
+	};
+
+	if (submission.status === "AC") {
+		updateOps.$addToSet["stats.SolvedProblems"] = problemId;
+	}
+
+	await User.findByIdAndUpdate(req.user._id, updateOps, { new: true });
+
+	// Recalculate accuracy
+	const allSubmissions = await Submission.find({ userId: req.user._id });
+	const total = allSubmissions.length;
+	const passed = allSubmissions.filter((s) => s.status === "AC").length;
+	const newAccuracy = total > 0 ? (passed / total) * 100 : 0;
+
+	await User.findByIdAndUpdate(req.user._id, {
+		"stats.accuracy": newAccuracy,
+	});
+
 	res.status(200).json(new ApiResponse(200, OJ_output.data));
 });

@@ -5,6 +5,12 @@ import ProfilePage from "./pages/ProfilePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import Layout from "./utils/Layout";
 import ProblemDetailPage from "./pages/ProblemDetailPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import axios from "axios";
+axios.defaults.withCredentials = true;
+
+import useAuthCheck from "./hooks/useAuthcheck";
 const router = createBrowserRouter([
 	{
 		path: "/",
@@ -14,6 +20,8 @@ const router = createBrowserRouter([
 			{ path: "problems", element: <ProblemPage /> },
 			{ path: "profile", element: <ProfilePage /> },
 			{ path: "problems/:id", element: <ProblemDetailPage /> },
+			{ path: "login", element: <LoginPage /> },
+			{ path: "register", element: <RegisterPage /> },
 		],
 	},
 	{ path: "*", element: <NotFoundPage /> },

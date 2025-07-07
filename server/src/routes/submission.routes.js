@@ -3,8 +3,8 @@ import { verifyJWT } from "../middlewares/auth.middlewares.js";
 
 import { AddNewSubmission } from "../controllers/submission.controllers.js";
 
-const router=Router();
+const router = Router();
 
-router.route("/new").post(verifyJWT,AddNewSubmission)
+router.route("/new").post(verifyJWT, AddNewSubmission);
 
 export default router;

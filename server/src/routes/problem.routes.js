@@ -6,7 +6,7 @@ import { AddNewProblem, getAllInputsAndOutputs, getProblemById, ListProblems } f
 const router = Router();
 
 router.route("/new").post(verifyJWT, AddNewProblem);
-router.route("/list").get(ListProblems);
+router.route("/list").get( ListProblems);
 router.route("/testcases/:problemId").get(getAllInputsAndOutputs);
 router.route("/:problemId").get(getProblemById);
 export default router;

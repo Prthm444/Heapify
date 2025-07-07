@@ -1,8 +1,13 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 
 const ProblemDetailPage = () => {
+	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+
+	if (!isLoggedIn) return <Navigate to="/login" replace />;
 	const { id } = useParams();
 	const [problem, setProblem] = useState(null);
 	const [code, setCode] = useState("");
@@ -11,18 +16,19 @@ const ProblemDetailPage = () => {
 
 	useEffect(() => {
 		const fetchProblem = async () => {
-			const res = await axios.get(`http://localhost:8001/problems/${id}`);
+			const res = await axios.get(`http://127.0.0.1:8001/problems/${id}`, { withCredentials: true });
 			setProblem(res.data.data);
 
-			await axios.post(
-				"http://localhost:8001/user/login",
-				{
-					username: "pratham2",
-					email: "adi@gmail.com",
-					password: "heheh",
-				},
-				{ withCredentials: true }
-			);
+			// const reslogin = await axios.post(
+			// 	"http://localhost:8001/user/login",
+			// 	{
+			// 		username: "pratham2",
+			// 		email: "adi@gmail.com",
+			// 		password: "heheh",
+			// 	},
+			// 	{ withCredentials: true }
+			// );
+			// console.log(reslogin);
 		};
 
 		fetchProblem();
@@ -31,7 +37,7 @@ const ProblemDetailPage = () => {
 	const handleSubmit = async () => {
 		try {
 			const res = await axios.post(
-				"http://localhost:8001/submissions/new",
+				"http://127.0.0.1:8001/submissions/new",
 				{
 					language,
 					code,
