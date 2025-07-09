@@ -9,8 +9,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import axios from "axios";
 axios.defaults.withCredentials = true;
-
-import useAuthCheck from "./hooks/useAuthcheck";
+import { ToastContainer } from "react-toastify";
 import AddProblemPage from "./pages/AddProblemPage";
 import MySubmissionsPage from "./pages/MySubmissionsPage";
 const router = createBrowserRouter([
@@ -32,7 +31,23 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-	return <RouterProvider router={router} />;
+	return (
+		<>
+			<RouterProvider router={router} />;
+			<ToastContainer
+				position="bottom-right"
+				autoClose={3000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick={false}
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="light"
+			/>
+		</>
+	);
 }
 
 export default App;

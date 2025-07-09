@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearUser } from "../redux/slices/userSlice";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
 	const navigate = useNavigate();
@@ -20,7 +21,7 @@ const Navbar = () => {
 				withCredentials: true,
 			});
 			dispatch(clearUser());
-			console.log("Logout successful:", logout.data);
+			toast.success("Logout successful!");
 			setShowLogoutModal(false);
 			navigate("/login");
 		} catch (err) {

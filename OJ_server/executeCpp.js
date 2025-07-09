@@ -14,7 +14,7 @@ if (!fs.existsSync(outputPath)) {
 const runCppAgainstTestCases = async (filepath, testcases) => {
 	const jobId = path.basename(filepath).split(".")[0];
 	const outPath = path.join(outputPath, `${jobId}.exe`);
-	console.log(testcases);
+	//console.log(testcases);
 	// Fetch test cases for the given problem
     const results = [];
 					let verdict = {

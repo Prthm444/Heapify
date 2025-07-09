@@ -5,6 +5,7 @@ import axios from "axios";
 import { getInputOutputPairsByProblemId } from "./problem.controllers.js";
 import Problem from "../models/problem.models.js";
 import { User } from "../models/user.models.js";
+import { ApiError } from "../utils/Error.utils.js";
 
 export const AddNewSubmission = asyncHandler(async (req, res) => {
 	const { language = "cpp", code, problemId } = req.body;
@@ -17,11 +18,12 @@ export const AddNewSubmission = asyncHandler(async (req, res) => {
 		code,
 		testcases: ioPairs,
 	});
+	//if (language === "py") language = "python";
 	const submission = await Submission.create({
 		userId: req.user._id,
 		problemId,
 		code,
-		language,
+		language: language === "py" ? "python" : language,
 		status: OJ_output.data.verdict.result,
 		result: OJ_output.data.results,
 		executionTime: OJ_output.data.verdict.executionTime,
@@ -67,4 +69,17 @@ export const getAllSubmissions = asyncHandler(async (req, res) => {
 		.lean();
 
 	res.status(200).json(new ApiResponse(200, submissions, "All submissions fetched successfully"));
+});
+
+export const RunCustomInput = asyncHandler(async (req, res) => {
+	const { code, language, customInput } = req.body;
+	//console.log(language);
+	try {
+		const result = await axios.post("http://localhost:7000/customrun", { code, language, customInput });
+		res.status(200).json(new ApiResponse(200, result.data, "Input ran successfully"));
+		console.log(result.data);
+	} catch (error) {
+		console.log("this is it :", error);
+		throw new ApiError(401, "OJ server error");
+	}
 });

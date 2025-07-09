@@ -11,7 +11,7 @@ const useAuthCheck = () => {
 	useEffect(() => {
 		const checkLogin = async () => {
 			try {
-				const res = await axios.get("http://127.0.0.1:8001/user/checklogin", {
+				const res = await axios.get("http://localhost:8001/user/checklogin", {
 					withCredentials: true,
 				});
 				dispatch(setUser({ user: res.data.data }));

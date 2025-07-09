@@ -61,7 +61,7 @@ const ProblemPage = () => {
 			<div className="absolute top-[-6rem] left-[-6rem] w-60 h-60 bg-purple-300 rounded-full opacity-20 blur-3xl animate-pulse" />
 			<div className="absolute bottom-[-6rem] right-[-6rem] w-60 h-60 bg-blue-300 rounded-full opacity-20 blur-3xl animate-pulse" />
 
-			<h1 className="text-4xl font-extrabold text-blue-800 mb-8 text-center">📘 Practice Problems</h1>
+			<h1 className="text-4xl font-extrabold text-blue-800 mb-8 text-center"> Practice Problems</h1>
 
 			{loading && <div className="text-center text-gray-600 font-medium animate-pulse">Fetching problems...</div>}
 
@@ -88,7 +88,7 @@ const ProblemPage = () => {
 									))}
 								</div>
 
-								<p className="text-xs text-gray-500 mt-1">🗓 Created on: {formatDate(problem.createdAt)}</p>
+								<p className="text-xs text-gray-500 mt-1"> Created on: {formatDate(problem.createdAt)}</p>
 							</div>
 						</NavLink>
 					))}

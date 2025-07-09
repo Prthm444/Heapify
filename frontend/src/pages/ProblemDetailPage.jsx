@@ -4,6 +4,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import Editor from "@monaco-editor/react";
+import { toast } from "react-toastify";
 
 const ProblemDetailPage = () => {
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
@@ -17,6 +18,10 @@ const ProblemDetailPage = () => {
 	const [firstFailedCase, setFirstFailedCase] = useState(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [showModal, setShowModal] = useState(false);
+	const [customInput, setCustomInput] = useState("");
+	const [runOutput, setRunOutput] = useState(null);
+	const [isRunning, setIsRunning] = useState(false);
+	const [showOutput, setShowOutput] = useState(true);
 
 	useEffect(() => {
 		const fetchProblem = async () => {
@@ -29,10 +34,50 @@ const ProblemDetailPage = () => {
 		fetchProblem();
 	}, [id]);
 
+	const handleRunCode = async () => {
+		if (!code.trim()) {
+			toast.error("Code cannot be empty");
+			return;
+		}
+		setIsRunning(true);
+		setRunOutput(null);
+		const loadingToast = toast.loading("Running your code...");
+		try {
+			const res = await axios.post(
+				"http://localhost:8001/submissions/run",
+				{
+					language,
+					code,
+					customInput,
+				},
+				{ withCredentials: true }
+			);
+			if (res.data.data.error) {
+			}
+			setRunOutput(res.data.data.output || res.data.data.error || "No output returned");
+			toast.update(loadingToast, {
+				render: "Code ran successfully!",
+				type: "success",
+				isLoading: false,
+				autoClose: 3000,
+			});
+		} catch (err) {
+			//console.error(err);
+			toast.update(loadingToast, {
+				render: " Please check your code or input.",
+				type: "error",
+				isLoading: false,
+				autoClose: 3000,
+			});
+		} finally {
+			setIsRunning(false);
+		}
+	};
+
 	const handleSubmit = async () => {
 		setIsSubmitting(true);
 		setFirstFailedCase(null); // Clear previous failed case
-
+		const loadingToast = toast.loading("Loading...");
 		try {
 			const res = await axios.post(
 				"http://localhost:8001/submissions/new",
@@ -51,8 +96,19 @@ const ProblemDetailPage = () => {
 			if (failed) setFirstFailedCase(failed);
 
 			setShowModal(true);
+			toast.update(loadingToast, {
+				render: "Submitted successfully!",
+				type: "success",
+				isLoading: false,
+				autoClose: 3000,
+			});
 		} catch (err) {
-			alert("Submission failed ❌");
+			toast.update(loadingToast, {
+				render: "Submission unsuccessful. Please try again.",
+				type: "error",
+				isLoading: false,
+				autoClose: 3000,
+			});
 			console.error(err);
 		} finally {
 			setIsSubmitting(false);
@@ -259,11 +315,33 @@ data = input().split()
 						/>
 					</div>
 
-					<div className="flex justify-end mt-4">
+					{/* Custom Input and Run Button */}
+					<div className="mt-4">
+						<label className="block text-sm font-medium text-gray-700 mb-1">Custom Input</label>
+						<textarea
+							rows={2}
+							className="w-full p-2 border rounded text-sm"
+							placeholder="Enter your custom input..."
+							value={customInput}
+							onChange={(e) => setCustomInput(e.target.value)}
+						></textarea>
+					</div>
+
+					<div className="flex justify-between mt-4 space-x-4">
+						<button
+							onClick={handleRunCode}
+							disabled={isRunning}
+							className={`bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700 transition w-1/2 ${
+								isRunning ? "opacity-50 cursor-not-allowed" : ""
+							}`}
+						>
+							{isRunning ? "Running..." : "Run Code"}
+						</button>
+
 						<button
 							onClick={handleSubmit}
 							disabled={isSubmitting}
-							className={`bg-blue-600 w-full text-white px-6 py-2 rounded hover:bg-blue-700 transition ${
+							className={`bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition w-1/2 ${
 								isSubmitting ? "opacity-50 cursor-not-allowed" : ""
 							}`}
 						>
@@ -277,6 +355,22 @@ data = input().split()
 							)}
 						</button>
 					</div>
+
+					{/* Output box */}
+					{runOutput && (
+						<div className="mt-4">
+							<button className="text-blue-600 text-sm font-medium mb-2 hover:underline" onClick={() => setShowOutput(!showOutput)}>
+								{showOutput ? "Hide Output" : "Show Output"}
+							</button>
+
+							{showOutput && (
+								<div className="text-sm bg-gray-50 border border-gray-300 p-4 rounded overflow-x-auto whitespace-pre-wrap">
+									<h4 className="font-semibold mb-2">💬 Output</h4>
+									<pre>{runOutput}</pre>
+								</div>
+							)}
+						</div>
+					)}
 				</div>
 			</div>
 

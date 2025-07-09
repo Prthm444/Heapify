@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import { toast } from "react-toastify";
 const exampleJSON = {
 	title: "Find the Maximum Element in an Array",
 	description: "Given an array of integers, your task is to find and return the maximum element in the array.",
@@ -41,6 +42,10 @@ const AddProblemPage = () => {
 	const [jsonInput, setJsonInput] = useState(JSON.stringify(exampleJSON, null, 2));
 	const [message, setMessage] = useState("");
 
+	useEffect(() => {
+		if (message) toast.info(message);
+	}, [message]);
+
 	const handleSubmit = async () => {
 		try {
 			const parsed = JSON.parse(jsonInput);
@@ -59,7 +64,7 @@ const AddProblemPage = () => {
 			});
 
 			setMessage("✅ Problem added successfully!");
-			console.log("Server response:", res.data);
+			//console.log("Server response:", res.data);
 		} catch (err) {
 			console.error(err);
 			setMessage("❌ Invalid JSON or submission failed.");

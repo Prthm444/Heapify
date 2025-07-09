@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../redux/slices/userSlice";
 import useAuthCheck from "../hooks/useAuthcheck";
 import { User, Lock, Eye, EyeOff, ArrowRight, Shield } from "lucide-react";
-
+import { ToastContainer, toast } from "react-toastify";
 const LoginPage = () => {
 	useAuthCheck();
 
@@ -34,10 +34,11 @@ const LoginPage = () => {
 				{ withCredentials: true }
 			);
 			dispatch(setUser({ user: res.data.data.user }));
-			alert("Login successful ✅");
+			toast.success("Login successful!");
+
 			navigate("/problems");
 		} catch (error) {
-			alert("Login failed ❌");
+			toast.error(error.response?.data?.message || "Login failed. Please try again.");
 			console.error(error);
 		} finally {
 			setIsLoading(false);
@@ -47,6 +48,7 @@ const LoginPage = () => {
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 flex items-center justify-center p-6 relative">
 			{/* Soft background bubbles */}
+
 			<div className="absolute inset-0 overflow-hidden z-0">
 				<div className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-200 rounded-full opacity-20 blur-3xl animate-pulse"></div>
 				<div className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-200 rounded-full opacity-20 blur-3xl animate-pulse"></div>
