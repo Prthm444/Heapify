@@ -3,41 +3,39 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import Editor from "@monaco-editor/react";
 
 const ProblemDetailPage = () => {
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-
 	if (!isLoggedIn) return <Navigate to="/login" replace />;
+
 	const { id } = useParams();
 	const [problem, setProblem] = useState(null);
 	const [code, setCode] = useState("");
 	const [language, setLanguage] = useState("cpp");
 	const [verdict, setVerdict] = useState(null);
+	const [firstFailedCase, setFirstFailedCase] = useState(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [showModal, setShowModal] = useState(false);
 
 	useEffect(() => {
 		const fetchProblem = async () => {
-			const res = await axios.get(`http://127.0.0.1:8001/problems/${id}`, { withCredentials: true });
+			const res = await axios.get(`http://localhost:8001/problems/${id}`, {
+				withCredentials: true,
+			});
 			setProblem(res.data.data);
-
-			// const reslogin = await axios.post(
-			// 	"http://localhost:8001/user/login",
-			// 	{
-			// 		username: "pratham2",
-			// 		email: "adi@gmail.com",
-			// 		password: "heheh",
-			// 	},
-			// 	{ withCredentials: true }
-			// );
-			// console.log(reslogin);
 		};
 
 		fetchProblem();
 	}, [id]);
 
 	const handleSubmit = async () => {
+		setIsSubmitting(true);
+		setFirstFailedCase(null); // Clear previous failed case
+
 		try {
 			const res = await axios.post(
-				"http://127.0.0.1:8001/submissions/new",
+				"http://localhost:8001/submissions/new",
 				{
 					language,
 					code,
@@ -46,15 +44,20 @@ const ProblemDetailPage = () => {
 				{ withCredentials: true }
 			);
 
-			setVerdict(res.data.data.verdict);
-			alert("Submission successful ✅");
+			const { verdict, results } = res.data.data;
+			setVerdict(verdict);
+
+			const failed = results.find((r) => r.status !== "Passed");
+			if (failed) setFirstFailedCase(failed);
+
+			setShowModal(true);
 		} catch (err) {
 			alert("Submission failed ❌");
 			console.error(err);
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
-
-	if (!problem) return <div className="p-6">Loading...</div>;
 
 	const getDifficultyColor = (difficulty) => {
 		switch (difficulty) {
@@ -68,104 +71,290 @@ const ProblemDetailPage = () => {
 				return "text-gray-700 bg-gray-100 border border-gray-300";
 		}
 	};
+	// Boilerplate codes
+	const cppBoilerplate = `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    // Fast I/O
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    
+    // Your code here
+    
+    
+    return 0;
+}`;
+
+	const javaBoilerplate = `import java.util.*;
+import java.io.*;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        // Fast I/O
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter pw = new PrintWriter(System.out);
+        
+        // Your code here
+        
+        
+        pw.flush();
+        pw.close();
+    }
+}`;
+
+	const pythonBoilerplate = `import sys
+input = sys.stdin.read
+data = input().split()
+
+# Your code here
+`;
+
+	const [SampleCode, setSampleCode] = useState(cppBoilerplate); // Initialize with C++ boilerplate
+
+	if (!problem) return <div className="p-6">Loading...</div>;
 
 	return (
-		<div className="flex h-screen">
-			{/* Left Section */}
-			<div className="w-1/2 p-6 flex flex-col justify-between border-r border-gray-300 overflow-y-auto">
-				<div>
-					<h1 className="text-2xl font-bold text-blue-700">{problem.title}</h1>
+		<>
+			<div className=" flex h-screen">
+				{/* Left Section */}
+				<div className="w-1/2 p-6 flex flex-col border-r border-gray-300 overflow-y-auto">
+					<div className="flex-1">
+						<h1 className="text-2xl font-bold text-blue-700">{problem.title}</h1>
+						<span className={`inline-block mt-2 px-3 py-1 rounded text-sm font-medium ${getDifficultyColor(problem.difficulty)}`}>
+							{problem.difficulty}
+						</span>
+						<div className="mt-2 flex flex-wrap gap-2 text-sm">
+							{problem.tags.map((tag, i) => (
+								<span key={i} className="bg-blue-100 text-blue-700 px-2 py-1 rounded">
+									{tag}
+								</span>
+							))}
+						</div>
 
-					{/* Difficulty Badge */}
-					<span className={`inline-block mt-2 px-3 py-1 rounded text-sm font-medium ${getDifficultyColor(problem.difficulty)}`}>
-						{problem.difficulty}
-					</span>
+						{/* Problem Description */}
+						<h2 className="text-lg font-semibold mt-6 mb-2 text-gray-700">Description</h2>
+						<p className="text-gray-800 whitespace-pre-line">{problem.description}</p>
 
-					{/* Tags */}
-					<div className="mt-2 flex flex-wrap gap-2 text-sm">
-						{problem.tags.map((tag, i) => (
-							<span key={i} className="bg-blue-100 text-blue-700 px-2 py-1 rounded">
-								{tag}
-							</span>
-						))}
-					</div>
+						<h3 className="mt-6 font-semibold">Input Format</h3>
+						<p className="text-gray-700 whitespace-pre-line">{problem.inputFormat}</p>
 
-					{/* Description */}
-					<h2 className="text-lg font-semibold mt-6 mb-2 text-gray-700">Description</h2>
-					<p className="text-gray-800 whitespace-pre-line">{problem.description}</p>
+						<h3 className="mt-4 font-semibold">Output Format</h3>
+						<p className="text-gray-700 whitespace-pre-line">{problem.outputFormat}</p>
 
-					{/* Input Format */}
-					<h3 className="mt-6 font-semibold">Input Format</h3>
-					<p className="text-gray-700 whitespace-pre-line">{problem.inputFormat}</p>
+						<h3 className="mt-4 font-semibold">Constraints</h3>
+						<p className="text-gray-700 whitespace-pre-line">{problem.constraints}</p>
 
-					{/* Output Format */}
-					<h3 className="mt-4 font-semibold">Output Format</h3>
-					<p className="text-gray-700 whitespace-pre-line">{problem.outputFormat}</p>
+						<h3 className="mt-6 font-semibold">Examples</h3>
+						<div className="mt-2 text-sm space-y-2">
+							{problem.examples?.map((ex, i) => (
+								<div key={i} className="bg-gray-100 p-3 rounded">
+									<p>
+										<strong>Input:</strong> {ex.input}
+									</p>
+									<p>
+										<strong>Output:</strong> {ex.output}
+									</p>
+									<p>
+										<strong>Explanation:</strong> {ex.explanation}
+									</p>
+								</div>
+							))}
+						</div>
 
-					{/* Constraints */}
-					<h3 className="mt-4 font-semibold">Constraints</h3>
-					<p className="text-gray-700 whitespace-pre-line">{problem.constraints}</p>
+						{/* Verdict Box */}
+						{verdict && (
+							<div
+								className={`mt-6 px-4 py-3 rounded border font-semibold text-sm ${
+									verdict.result === "AC" ? "bg-green-100 text-green-800 border-green-300" : "bg-red-100 text-red-800 border-red-300"
+								}`}
+							>
+								{verdict.result === "AC" ? (
+									<>
+										✅ <strong>Accepted</strong> – All testcases passed
+										<br />⏱ Time: <strong>{verdict.executionTime}</strong>
+									</>
+								) : (
+									<>
+										❌ <strong>{verdict.result}</strong> – Some testcases failed
+										<br />
+										🚫 Failed: <strong>{verdict.failed}</strong>
+									</>
+								)}
+							</div>
+						)}
 
-					{/* Examples */}
-					<h3 className="mt-6 font-semibold">Examples</h3>
-					<div className="mt-2 text-sm space-y-2">
-						{problem.examples?.map((ex, i) => (
-							<div key={i} className="bg-gray-100 p-3 rounded">
+						{/* First Failed Case */}
+						{firstFailedCase && (
+							<div className="mt-4 text-sm bg-red-50 border border-red-300 text-red-800 p-4 rounded space-y-2 overflow-x-auto">
+								<h4 className="font-semibold">❌ First Failed Test Case</h4>
 								<p>
-									<strong>Input:</strong> {ex.input}
+									<strong>Input:</strong> <code>{firstFailedCase.input}</code>
 								</p>
 								<p>
-									<strong>Output:</strong> {ex.output}
+									<strong>Expected Output:</strong> <code>{firstFailedCase.expectedOutput}</code>
 								</p>
 								<p>
-									<strong>Explanation:</strong> {ex.explanation}
+									<strong>Actual Output:</strong> <code>{firstFailedCase.actualOutput}</code>
+								</p>
+								<p>
+									<strong>Execution Time:</strong> {firstFailedCase.executionTime.toFixed(2)} ms
 								</p>
 							</div>
-						))}
+						)}
 					</div>
 				</div>
 
-				{/* Submit Button */}
-				<div>
-					<button onClick={handleSubmit} className="mt-6 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition w-full">
-						Submit
-					</button>
+				{/* Right Section: Editor + Submit */}
+				<div className="w-1/2 p-6 flex flex-col">
+					<div className="flex justify-between items-center mb-2">
+						<h2 className="text-lg font-semibold">Your Solution</h2>
+						<div className="flex items-center space-x-2">
+							<label htmlFor="language" className="text-sm font-medium text-gray-700">
+								Language:
+							</label>
+							<select
+								id="language"
+								value={language}
+								onChange={(e) => {
+									setLanguage(e.target.value);
+									// Set boilerplate code when language changes
+									switch (e.target.value) {
+										case "cpp":
+											setSampleCode(cppBoilerplate);
+											break;
+										case "java":
+											setSampleCode(javaBoilerplate);
+											break;
+										case "py":
+											setSampleCode(pythonBoilerplate);
+											break;
+										default:
+											setSampleCode("");
+									}
+								}}
+								className="border rounded px-2 py-1 text-sm"
+							>
+								<option value="cpp">C++</option>
+								<option value="java">Java</option>
+								<option value="py">Python</option>
+							</select>
+						</div>
+					</div>
 
-					{/* Verdict Box */}
-					{verdict && (
-						<div
-							className={`mt-4 px-4 py-3 rounded border font-semibold text-sm ${
-								verdict.result === "AC" ? "bg-green-100 text-green-800 border-green-300" : "bg-red-100 text-red-800 border-red-300"
+					<div className="border rounded overflow-hidden flex-1 min-h-0">
+						<Editor
+							height="100%"
+							language={language}
+							theme="vs-light"
+							value={SampleCode}
+							onChange={(value) => setCode(value || "")}
+							options={{
+								fontSize: 14,
+								minimap: { enabled: false },
+								wordWrap: "on",
+								scrollBeyondLastLine: false,
+								automaticLayout: true,
+							}}
+						/>
+					</div>
+
+					<div className="flex justify-end mt-4">
+						<button
+							onClick={handleSubmit}
+							disabled={isSubmitting}
+							className={`bg-blue-600 w-full text-white px-6 py-2 rounded hover:bg-blue-700 transition ${
+								isSubmitting ? "opacity-50 cursor-not-allowed" : ""
 							}`}
 						>
-							{verdict.result === "AC" ? (
-								<>
-									✅ <strong>Accepted</strong> – All testcases passed
-									<br />⏱ Time: <strong>{verdict.executionTime}</strong>
-								</>
+							{isSubmitting ? (
+								<div className="flex items-center space-x-2">
+									<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+									<span>Submitting...</span>
+								</div>
 							) : (
-								<>
-									❌ <strong>{verdict.result}</strong> – Some testcases failed
-									<br />
-									🚫 Failed: <strong>{verdict.failed}</strong>
-								</>
+								"Submit"
 							)}
-						</div>
-					)}
+						</button>
+					</div>
 				</div>
 			</div>
 
-			{/* Right Section: Code Editor */}
-			<div className="w-1/2 p-6">
-				<h2 className="text-lg font-semibold mb-2">Your Solution</h2>
-				<textarea
-					placeholder="// Write your code here"
-					value={code}
-					onChange={(e) => setCode(e.target.value)}
-					className="w-full h-full font-mono p-4 border rounded resize-none text-sm outline-none"
-				/>
-			</div>
-		</div>
+			{/* Submission Result Modal */}
+			{showModal && (
+				<div className="fixed inset-0  bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+					<div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl">
+						<div className="flex justify-between items-center mb-4">
+							<h3 className="text-xl font-bold">Submission Result</h3>
+							<button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-700">
+								✕
+							</button>
+						</div>
+
+						<div
+							className={`p-4 rounded-lg mb-4 ${
+								verdict.result === "AC"
+									? "bg-green-50 border border-green-200 text-green-800"
+									: "bg-red-50 border border-red-200 text-red-800"
+							}`}
+						>
+							<div className="flex items-center gap-2">
+								{verdict.result === "AC" ? (
+									<>
+										<span className="text-2xl">✅</span>
+										<div>
+											<p className="font-bold">Accepted</p>
+											<p className="text-sm">All test cases passed</p>
+										</div>
+									</>
+								) : (
+									<>
+										<span className="text-2xl">❌</span>
+										<div>
+											<p className="font-bold">{verdict.result}</p>
+											<p className="text-sm">{verdict.failed} test case(s) failed</p>
+										</div>
+									</>
+								)}
+							</div>
+						</div>
+
+						{firstFailedCase && (
+							<div className="space-y-4">
+								<h4 className="font-semibold">Failed Test Case Details</h4>
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+									<div className="bg-gray-50 p-3 rounded border">
+										<h5 className="font-medium text-sm mb-1">Input</h5>
+										<pre className="text-xs bg-white p-2 rounded overflow-x-auto">{firstFailedCase.input}</pre>
+									</div>
+									<div className="bg-gray-50 p-3 rounded border">
+										<h5 className="font-medium text-sm mb-1">Expected Output</h5>
+										<pre className="text-xs bg-white p-2 rounded overflow-x-auto">{firstFailedCase.expectedOutput}</pre>
+									</div>
+									<div className="bg-gray-50 p-3 rounded border">
+										<h5 className="font-medium text-sm mb-1">Your Output</h5>
+										<pre className="text-xs bg-white p-2 rounded overflow-x-auto">{firstFailedCase.actualOutput}</pre>
+									</div>
+									<div className="bg-gray-50 p-3 rounded border">
+										<h5 className="font-medium text-sm mb-1">Execution Time</h5>
+										<p className="text-xs bg-white p-2 rounded">{firstFailedCase.executionTime.toFixed(2)} ms</p>
+									</div>
+								</div>
+							</div>
+						)}
+
+						<div className="mt-6 flex justify-end">
+							<button
+								onClick={() => setShowModal(false)}
+								className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+							>
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+		</>
 	);
 };
 

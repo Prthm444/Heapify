@@ -11,17 +11,21 @@ import axios from "axios";
 axios.defaults.withCredentials = true;
 
 import useAuthCheck from "./hooks/useAuthcheck";
+import AddProblemPage from "./pages/AddProblemPage";
+import MySubmissionsPage from "./pages/MySubmissionsPage";
 const router = createBrowserRouter([
 	{
 		path: "/",
 		element: <Layout />,
 		children: [
-			{ index: true, element: <MainPage /> },
+			{ index: true, element: <ProblemPage /> },
 			{ path: "problems", element: <ProblemPage /> },
 			{ path: "profile", element: <ProfilePage /> },
 			{ path: "problems/:id", element: <ProblemDetailPage /> },
 			{ path: "login", element: <LoginPage /> },
 			{ path: "register", element: <RegisterPage /> },
+			{ path: "add-problem", element: <AddProblemPage /> },
+			{ path: "submissions", element: <MySubmissionsPage /> },
 		],
 	},
 	{ path: "*", element: <NotFoundPage /> },

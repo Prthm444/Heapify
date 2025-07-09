@@ -58,3 +58,13 @@ export const AddNewSubmission = asyncHandler(async (req, res) => {
 
 	res.status(200).json(new ApiResponse(200, OJ_output.data));
 });
+
+export const getAllSubmissions = asyncHandler(async (req, res) => {
+	const submissions = await Submission.find({ userId: req.user._id })
+		.sort({ createdAt: -1 })
+		.select("problemId status createdAt language executionTime") // Only select essential fields
+		.populate("problemId", "title")
+		.lean();
+
+	res.status(200).json(new ApiResponse(200, submissions, "All submissions fetched successfully"));
+});

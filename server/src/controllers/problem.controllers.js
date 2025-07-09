@@ -5,6 +5,7 @@ import { ApiError } from "../utils/Error.utils.js";
 
 export const AddNewProblem = asyncHandler(async (req, res) => {
 	const { title, description, difficulty, tags, inputFormat, outputFormat, constraints, examples, testCases } = req.body;
+	//console.log("adding problem called : ", req.body);
 
 	if (
 		[title, description, difficulty, inputFormat, outputFormat, constraints].some((fields) => {

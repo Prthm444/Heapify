@@ -26,7 +26,7 @@ const runCppAgainstTestCases = async (filepath, testcases) => {
 					};
 	try {
 		const testCases = testcases;
-		console.log("found testcases : ", testCases);
+		//console.log("found testcases : ", testCases);
 
 		if (!Array.isArray(testCases) || testCases.length === 0) {
 			return Promise.reject(
