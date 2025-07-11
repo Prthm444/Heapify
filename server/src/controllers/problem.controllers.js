@@ -1,4 +1,5 @@
 import Problem from "../models/problem.models.js";
+import { GetAiResposne } from "../utils/AiResponse.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
 import { asyncHandler } from "../utils/async.utils.js";
 import { ApiError } from "../utils/Error.utils.js";
@@ -77,4 +78,31 @@ export const getProblemById = asyncHandler(async (req, res) => {
 		throw new ApiError(404, "Problem not found");
 	}
 	res.status(200).json(new ApiResponse(200, problem, "problem found"));
+});
+
+export const GetAiCodeReview = asyncHandler(async (req, res) => {
+	const { code, problem } = req.body;
+
+	if (!code || !problem) {
+		throw new ApiError(400, "Missing required fields: code, problem, or submission");
+	}
+
+	const TIMEOUT_MS = 15000;
+
+	// Timeout promise
+	const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("AI response timed out after 15 seconds")), TIMEOUT_MS));
+
+	try {
+		// Run the AI response function with timeout
+		const response = await Promise.race([GetAiResposne(code, problem), timeoutPromise]);
+
+		if (!response) {
+			throw new ApiError(500, "AI response generation failed");
+		}
+
+		return res.status(200).json(new ApiResponse(200, { review: response }, "AI review generated successfully"));
+	} catch (error) {
+		console.error("[AI Review Error]:", error.message);
+		throw new ApiError(500, error.message || "Internal Server Error while generating AI review");
+	}
 });

@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import { toast } from "react-toastify";
+import ReactMarkdown from "react-markdown";
 
 const ProblemDetailPage = () => {
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
@@ -17,11 +18,14 @@ const ProblemDetailPage = () => {
 	const [verdict, setVerdict] = useState(null);
 	const [firstFailedCase, setFirstFailedCase] = useState(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isSubmittingAI, setIsSubmittingAI] = useState(false);
 	const [showModal, setShowModal] = useState(false);
 	const [customInput, setCustomInput] = useState("");
 	const [runOutput, setRunOutput] = useState(null);
 	const [isRunning, setIsRunning] = useState(false);
 	const [showOutput, setShowOutput] = useState(true);
+	const [showAIModal, setShowAIModal] = useState(false);
+	const [AiReview, setAiReview] = useState("");
 
 	useEffect(() => {
 		const fetchProblem = async () => {
@@ -72,6 +76,31 @@ const ProblemDetailPage = () => {
 		} finally {
 			setIsRunning(false);
 		}
+	};
+
+	const handleAI = async () => {
+		setIsSubmittingAI(true);
+		try {
+			const response = await axios.post(
+				"http://localhost:8001/problems/ai",
+				{
+					code,
+					problem,
+				},
+				{
+					withCredentials: true,
+				}
+			);
+
+			setAiReview(response.data.data.review);
+			//console.log("ai : -------- ", AiReview);
+			setShowAIModal(true);
+		} catch (err) {
+			console.log(err);
+			toast.error("Error while getting Ai review");
+		}
+
+		setIsSubmittingAI(false);
 	};
 
 	const handleSubmit = async () => {
@@ -354,6 +383,22 @@ data = input().split()
 								"Submit"
 							)}
 						</button>
+						<button
+							onClick={handleAI}
+							disabled={isSubmittingAI}
+							className={`bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition w-1/2 ${
+								isSubmittingAI ? "opacity-50 cursor-not-allowed" : ""
+							}`}
+						>
+							{isSubmittingAI ? (
+								<div className="flex items-center space-x-2">
+									<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+									<span>Getting AI review...</span>
+								</div>
+							) : (
+								"Get AI Review"
+							)}
+						</button>
 					</div>
 
 					{/* Output box */}
@@ -373,7 +418,6 @@ data = input().split()
 					)}
 				</div>
 			</div>
-
 			{/* Submission Result Modal */}
 			{showModal && (
 				<div className="fixed inset-0  bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
@@ -444,6 +488,30 @@ data = input().split()
 							>
 								Close
 							</button>
+						</div>
+					</div>
+				</div>
+			)}
+			{showAIModal && (
+				<div className="h-auto fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+					<div className="h-auto relative bg-white/90 dark:bg-gray-900/80 backdrop-blur-md p-6 rounded-2xl shadow-xl max-w-5xl w-[90%] border border-white/10">
+						{/* Close Button */}
+						<button
+							onClick={() => setShowAIModal(false)}
+							className="absolute top-3 right-3 text-gray-600 dark:text-gray-300 hover:text-red-500 transition-colors"
+							aria-label="Close AI Review Modal"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+							</svg>
+						</button>
+
+						{/* Header */}
+						<h2 className="text-4xl font-bold mb-8 text-gray-800 dark:text-white">AI Code Review</h2>
+
+						{/* Markdown Content */}
+						<div className="m-3 prose prose-lg dark:prose-invert max-h-[65vh] overflow-y-auto px-4 text-gray-700 dark:text-gray-200">
+							<ReactMarkdown>{AiReview}</ReactMarkdown>
 						</div>
 					</div>
 				</div>

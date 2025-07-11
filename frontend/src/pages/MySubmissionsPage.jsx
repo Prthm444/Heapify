@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { Navigate, NavLink } from "react-router-dom";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { prism } from "react-syntax-highlighter/dist/esm/styles/prism"; // ✅ Light theme
 
 const MySubmissionsPage = () => {
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
@@ -40,53 +42,49 @@ const MySubmissionsPage = () => {
 	const getStatusStyle = (status) => {
 		switch (status) {
 			case "AC":
-				return "bg-green-100 text-green-800 border-green-300";
+				return "bg-green-50 text-green-700 border-green-200";
 			case "TLE":
 			case "RE":
 			case "CLE":
-				return "bg-orange-100 text-orange-800 border-orange-300";
+				return "bg-yellow-50 text-yellow-700 border-yellow-200";
 			case "RJ":
 			case "WA":
 			default:
-				return "bg-red-100 text-red-800 border-red-300";
+				return "bg-red-50 text-red-700 border-red-200";
 		}
 	};
 
 	return (
-		<div className="p-6 max-w-5xl mx-auto">
+		<div className="p-6 max-w-6xl mx-auto">
 			<h1 className="text-3xl font-bold text-blue-700 mb-6">My Submissions</h1>
 
 			{loading && <p className="text-gray-500">Loading submissions...</p>}
 			{error && <p className="text-red-600">{error}</p>}
-
 			{submissions.length === 0 && !loading && !error && <p className="text-gray-600">No submissions yet.</p>}
 
 			{submissions.length > 0 && (
-				<div className="space-y-4">
+				<div className="space-y-6">
 					{submissions.map((submission) => (
-						<div key={submission._id} className="border border-gray-200 rounded-md shadow-sm p-4 hover:shadow transition">
+						<div key={submission._id} className="border border-gray-200 rounded-xl shadow-sm p-6 hover:shadow-md transition bg-blue-100">
 							<div className="flex justify-between items-start">
 								<div>
 									<h2 className="text-lg font-semibold text-gray-800">
 										{submission.problemId ? (
-											<NavLink to={`/problems/${submission.problemId._id}`} className="text-blue-700 hover:underline">
+											<NavLink to={`/problems/${submission.problemId._id}`} className="text-blue-600 hover:underline">
 												{submission.problemId.title}
 											</NavLink>
 										) : (
 											<span className="text-gray-400 italic">[Deleted Problem]</span>
 										)}
 									</h2>
-									<p className="text-sm text-gray-600 mt-1">Submitted on: {formatDate(submission.createdAt)}</p>
+									<p className="text-sm text-gray-500 mt-1">Submitted on: {formatDate(submission.createdAt)}</p>
 								</div>
-
-								{/* Status Badge */}
-								<div className={`text-sm font-medium px-3 py-1 rounded border ${getStatusStyle(submission.status)}`}>
+								<div className={`text-sm font-semibold px-3 py-1 rounded-full border ${getStatusStyle(submission.status)}`}>
 									{submission.status}
 								</div>
 							</div>
 
-							{/* Details */}
-							<div className="mt-3 text-sm text-gray-700 space-y-1">
+							<div className="mt-4 text-sm text-gray-700 space-y-1">
 								<p>
 									<strong>Language:</strong> {submission.language.toUpperCase()}
 								</p>
@@ -97,6 +95,27 @@ const MySubmissionsPage = () => {
 									<strong>Submission ID:</strong> {submission._id}
 								</p>
 							</div>
+
+							{submission.code && (
+								<div className="mt-5">
+									<p className="text-sm font-medium text-gray-800 mb-2">Submitted Code:</p>
+									<SyntaxHighlighter
+										language={submission.language.toLowerCase()}
+										style={prism}
+										customStyle={{
+											borderRadius: "0.75rem",
+											fontSize: "0.85rem",
+											padding: "1rem",
+											background: "#f9fafb",
+											border: "1px solid #e5e7eb",
+										}}
+										showLineNumbers
+										wrapLongLines
+									>
+										{submission.code}
+									</SyntaxHighlighter>
+								</div>
+							)}
 						</div>
 					))}
 				</div>

@@ -3,6 +3,7 @@ import axios from "axios";
 import { NavLink, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
+
 const ProblemPage = () => {
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 	const [problems, setProblems] = useState([]);
@@ -56,6 +57,8 @@ const ProblemPage = () => {
 					Add New Problem
 				</button>
 			</NavLink>
+
+			
 
 			{/* Floating Blurs */}
 			<div className="absolute top-[-6rem] left-[-6rem] w-60 h-60 bg-purple-300 rounded-full opacity-20 blur-3xl animate-pulse" />

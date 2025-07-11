@@ -64,7 +64,7 @@ export const AddNewSubmission = asyncHandler(async (req, res) => {
 export const getAllSubmissions = asyncHandler(async (req, res) => {
 	const submissions = await Submission.find({ userId: req.user._id })
 		.sort({ createdAt: -1 })
-		.select("problemId status createdAt language executionTime") // Only select essential fields
+		.select("problemId status createdAt language executionTime code") // Only select essential fields
 		.populate("problemId", "title")
 		.lean();
 
