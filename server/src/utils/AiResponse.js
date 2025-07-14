@@ -5,8 +5,9 @@ dotenv.config();
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function GetAiResposne(code, problem) {
+	//console.log("problem given to ai : ", problem);
 	const prompt = `
-You are an expert coding assistant reviewing user-submitted code .
+You are an expert coding assistant your job is understanding the problem json that i give u and reviewing user-submitted code .
 
 Review the following code:
 
@@ -28,18 +29,67 @@ ${problem}
 
 
 
-You are talking to the user keep in mind. ake sure u have proper spacing between points
+You are talking to the user keep in mind. make sure you use markdown in the response to add extra extra spacing between points .
 
 `;
 
 	try {
 		const response = await ai.models.generateContent({
 			model: "gemini-2.5-flash",
-			contents: prompt,
+			contents: [
+				{
+					role: "user",
+					parts: [
+						{
+							text: `
+You are an expert coding assistant. Your task is to analyze the provided problem and the user-submitted code.
+
+Please generate a clear and structured markdown response with properly spaced paragraphs.
+
+---
+
+### Problem:
+
+\`\`\`json
+${problem}
+\`\`\`
+
+---
+
+### Code:
+
+\`\`\`
+${code}
+\`\`\`
+
+---
+
+### AI Code Review
+
+Please follow this exact structure in your response:
+
+1. Start each numbered point with a **bold title** followed by a colon.  
+   Then add your explanation in a new paragraph, **not on the same line**.
+
+2. Add **a blank line between every paragraph** (two \n s in raw text).
+
+3. Do not use nested lists. Avoid putting multiple sentences in a single paragraph unless necessary.
+
+4. End the review with a **short, motivating message** in its own paragraph.
+
+---
+
+Use markdown formatting with clean, readable output. Do **not** use HTML. Paragraph spacing is important.
+`,
+						},
+					],
+				},
+			],
 		});
-		console.log(response.text);
+
+		//console.log(response.text);
 		return response.text;
 	} catch (error) {
-		console.log("got error while generating response :", error);
+		//console.log("got error while generating response :", error);
 	}
 }

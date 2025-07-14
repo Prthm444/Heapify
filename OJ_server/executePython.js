@@ -34,13 +34,21 @@ const runPythonAgainstTestCases = async (filepath, testcases) => {
 					return resolve({ results, verdict });
 				}
 
-				const { input, output: expectedOutput } = testcases[index];
+				const { input, output: expectedOutput, isPublic } = testcases[index];
 				const startTime = process.hrtime();
 
 				const runProcess = spawn("python", [filepath]);
 
 				let stdout = "";
 				let stderr = "";
+				let timedOut = false;
+				let timeout = 5000;
+
+				// Kill the process if it runs too long
+				const timer = setTimeout(() => {
+					timedOut = true;
+					runProcess.kill("SIGKILL");
+				}, timeout);
 
 				runProcess.stdin.write(input);
 				runProcess.stdin.end();
@@ -56,24 +64,33 @@ const runPythonAgainstTestCases = async (filepath, testcases) => {
 				runProcess.on("close", (code) => {
 					const [seconds, nanoseconds] = process.hrtime(startTime);
 					const executionTime = seconds * 1000 + nanoseconds / 1e6;
+					clearTimeout(timer);
+					if (timedOut) {
+						fs.unlink(filepath, () => {});
+						verdict.currentTestcase = index + 1;
+						verdict.result = "TLE";
+
+						//console.log(`[ERROR] Time limit exceeded`);
+						return resolve({ results, verdict });
+					}
 
 					if (code !== 0 || stderr) {
 						fs.unlink(filepath, () => {});
 						verdict.currentTestcase = index + 1;
 						verdict.result = "RE";
-						console.log(`[ERROR] Runtime error: ${stderr}`);
+						//console.log(`[ERROR] Runtime error: ${stderr}`);
 						return resolve({ results, verdict });
 					}
 
-					if (executionTime > 2000) {
+					if (executionTime > 3000) {
 						fs.unlink(filepath, () => {});
 						verdict.currentTestcase = index + 1;
 						verdict.result = "TLE";
-						console.log(`[ERROR] Time limit exceeded`);
+						//console.log(`[ERROR] Time limit exceeded`);
 						return resolve({ results, verdict });
 					}
 
-					const actual = stdout.trim();
+					const actual = stdout.trim() || " ";
 					const passed = actual === expectedOutput.trim();
 					if (passed) {
 						verdict.passed += 1;
@@ -82,9 +99,9 @@ const runPythonAgainstTestCases = async (filepath, testcases) => {
 					}
 
 					results.push({
-						input,
-						expectedOutput,
-						actualOutput: actual,
+						input: isPublic ? input : "Hidden",
+						expectedOutput: isPublic ? expectedOutput : "Hidden",
+						actualOutput: isPublic ? actual : "Hidden",
 						status: passed ? "Passed" : "Failed",
 						executionTime,
 					});
@@ -96,7 +113,7 @@ const runPythonAgainstTestCases = async (filepath, testcases) => {
 			runTest(0);
 		});
 	} catch (err) {
-		console.error("[FATAL ERROR]:", err);
+		//console.error("[FATAL ERROR]:", err);
 		throw err;
 	}
 };

@@ -27,135 +27,6 @@ const ProblemDetailPage = () => {
 	const [showAIModal, setShowAIModal] = useState(false);
 	const [AiReview, setAiReview] = useState("");
 
-	useEffect(() => {
-		const fetchProblem = async () => {
-			const res = await axios.get(`http://localhost:8001/problems/${id}`, {
-				withCredentials: true,
-			});
-			setProblem(res.data.data);
-		};
-
-		fetchProblem();
-	}, [id]);
-
-	const handleRunCode = async () => {
-		if (!code.trim()) {
-			toast.error("Code cannot be empty");
-			return;
-		}
-		setIsRunning(true);
-		setRunOutput(null);
-		const loadingToast = toast.loading("Running your code...");
-		try {
-			const res = await axios.post(
-				"http://localhost:8001/submissions/run",
-				{
-					language,
-					code,
-					customInput,
-				},
-				{ withCredentials: true }
-			);
-			if (res.data.data.error) {
-			}
-			setRunOutput(res.data.data.output || res.data.data.error || "No output returned");
-			toast.update(loadingToast, {
-				render: "Code ran successfully!",
-				type: "success",
-				isLoading: false,
-				autoClose: 3000,
-			});
-		} catch (err) {
-			//console.error(err);
-			toast.update(loadingToast, {
-				render: " Please check your code or input.",
-				type: "error",
-				isLoading: false,
-				autoClose: 3000,
-			});
-		} finally {
-			setIsRunning(false);
-		}
-	};
-
-	const handleAI = async () => {
-		setIsSubmittingAI(true);
-		try {
-			const response = await axios.post(
-				"http://localhost:8001/problems/ai",
-				{
-					code,
-					problem,
-				},
-				{
-					withCredentials: true,
-				}
-			);
-
-			setAiReview(response.data.data.review);
-			//console.log("ai : -------- ", AiReview);
-			setShowAIModal(true);
-		} catch (err) {
-			console.log(err);
-			toast.error("Error while getting Ai review");
-		}
-
-		setIsSubmittingAI(false);
-	};
-
-	const handleSubmit = async () => {
-		setIsSubmitting(true);
-		setFirstFailedCase(null); // Clear previous failed case
-		const loadingToast = toast.loading("Loading...");
-		try {
-			const res = await axios.post(
-				"http://localhost:8001/submissions/new",
-				{
-					language,
-					code,
-					problemId: id,
-				},
-				{ withCredentials: true }
-			);
-
-			const { verdict, results } = res.data.data;
-			setVerdict(verdict);
-
-			const failed = results.find((r) => r.status !== "Passed");
-			if (failed) setFirstFailedCase(failed);
-
-			setShowModal(true);
-			toast.update(loadingToast, {
-				render: "Submitted successfully!",
-				type: "success",
-				isLoading: false,
-				autoClose: 3000,
-			});
-		} catch (err) {
-			toast.update(loadingToast, {
-				render: "Submission unsuccessful. Please try again.",
-				type: "error",
-				isLoading: false,
-				autoClose: 3000,
-			});
-			console.error(err);
-		} finally {
-			setIsSubmitting(false);
-		}
-	};
-
-	const getDifficultyColor = (difficulty) => {
-		switch (difficulty) {
-			case "Easy":
-				return "text-green-700 bg-green-100 border border-green-300";
-			case "Medium":
-				return "text-yellow-700 bg-yellow-100 border border-yellow-300";
-			case "Hard":
-				return "text-red-700 bg-red-100 border border-red-300";
-			default:
-				return "text-gray-700 bg-gray-100 border border-gray-300";
-		}
-	};
 	// Boilerplate codes
 	const cppBoilerplate = `#include <bits/stdc++.h>
 using namespace std;
@@ -194,6 +65,161 @@ data = input().split()
 
 # Your code here
 `;
+
+	useEffect(() => {
+		const fetchProblem = async () => {
+			const res = await axios.get(`http://localhost:8001/problems/${id}`, {
+				withCredentials: true,
+			});
+			setProblem(res.data.data);
+		};
+
+		fetchProblem();
+	}, [id]);
+
+	useEffect(() => {
+		if (language === "cpp") {
+			setCode(cppBoilerplate);
+		} else if (code === "py") {
+			setCode(pythonBoilerplate);
+		} else if (language === "java") {
+			setCode(javaBoilerplate);
+		}
+	}, [language]);
+
+	const handleRunCode = async () => {
+		setVerdict(null);
+		setFirstFailedCase(null);
+		if (!code.trim()) {
+			toast.error("Code cannot be empty");
+			return;
+		}
+		setIsRunning(true);
+		setRunOutput(null);
+		const loadingToast = toast.loading("Running your code...");
+
+		try {
+			const res = await axios.post(
+				"http://localhost:8001/submissions/run",
+				{
+					language,
+					code,
+					customInput,
+				},
+				{ withCredentials: true }
+			);
+
+			setRunOutput(res.data.data.output || res.data.data.error || "No output returned");
+			toast.update(loadingToast, {
+				render: res.data.data.error ? "Some error during running code" : "Code ran successfully!",
+				type: res.data.data.error ? "error" : "success",
+				isLoading: false,
+				autoClose: 3000,
+			});
+		} catch (err) {
+			//console.error(err);
+			toast.update(loadingToast, {
+				render: " Server error",
+				type: "error",
+				isLoading: false,
+				autoClose: 3000,
+			});
+		} finally {
+			setIsRunning(false);
+		}
+	};
+
+	const handleAI = async () => {
+		setIsSubmittingAI(true);
+		const loadingToastAI = toast.loading("Getting Ai review...");
+		try {
+			const response = await axios.post(
+				"http://localhost:8001/problems/ai",
+				{
+					code,
+					problem,
+				},
+				{
+					withCredentials: true,
+				}
+			);
+			toast.update(loadingToastAI, {
+				render: "Request successfull!",
+				type: "success",
+				isLoading: false,
+				autoClose: 3000,
+			});
+			setAiReview(response.data.data.review);
+			//console.log("ai : -------- ", AiReview);
+			setShowAIModal(true);
+		} catch (err) {
+			toast.error("Error while getting Ai review");
+			toast.update(loadingToastAI, {
+				render: " Some error has occured ",
+				type: "error",
+				isLoading: false,
+				autoClose: 3000,
+			});
+		}
+
+		setIsSubmittingAI(false);
+	};
+
+	const handleSubmit = async () => {
+		setVerdict(null);
+		setFirstFailedCase(null);
+		setIsSubmitting(true);
+		setFirstFailedCase(null); // Clear previous failed case
+		const loadingToast = toast.loading("Loading...");
+		try {
+			const res = await axios.post(
+				"http://localhost:8001/submissions/new",
+				{
+					language,
+					code,
+					problemId: id,
+				},
+				{ withCredentials: true }
+			);
+
+			const { verdict, results } = res.data.data;
+			setVerdict(verdict);
+
+			const failed = results.find((r) => r.status !== "Passed") || "";
+			if (failed) setFirstFailedCase(failed);
+
+			setShowModal(true);
+			toast.update(loadingToast, {
+				render: "Submitted successfully!",
+				type: "success",
+				isLoading: false,
+				autoClose: 3000,
+			});
+		} catch (err) {
+			toast.update(loadingToast, {
+				render: "Submission unsuccessful. Please try again.",
+				type: "error",
+				isLoading: false,
+				autoClose: 3000,
+			});
+			console.error(err);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	const getDifficultyColor = (difficulty) => {
+		switch (difficulty) {
+			case "Easy":
+				return "text-green-700 bg-green-100 border border-green-300";
+			case "Medium":
+				return "text-yellow-700 bg-yellow-100 border border-yellow-300";
+			case "Hard":
+				return "text-red-700 bg-red-100 border border-red-300";
+			default:
+				return "text-gray-700 bg-gray-100 border border-gray-300";
+		}
+	};
 
 	const [SampleCode, setSampleCode] = useState(cppBoilerplate); // Initialize with C++ boilerplate
 
@@ -256,14 +282,23 @@ data = input().split()
 							>
 								{verdict.result === "AC" ? (
 									<>
-										✅ <strong>Accepted</strong> – All testcases passed
+										<strong>Accepted</strong> – All testcases passed
 										<br />⏱ Time: <strong>{verdict.executionTime}</strong>
 									</>
 								) : (
 									<>
-										❌ <strong>{verdict.result}</strong> – Some testcases failed
+										<strong>
+											{verdict.result === "TLE"
+												? "Time Limit Exceeded"
+												: verdict.result === "RE"
+												? "Runtime Error"
+												: verdict.result === "CLE"
+												? "Compilation Error"
+												: verdict.result}
+										</strong>{" "}
+										Some testcases failed
 										<br />
-										🚫 Failed: <strong>{verdict.failed}</strong>
+										Failed: <strong>{verdict.failed}</strong>
 									</>
 								)}
 							</div>
@@ -272,7 +307,7 @@ data = input().split()
 						{/* First Failed Case */}
 						{firstFailedCase && (
 							<div className="mt-4 text-sm bg-red-50 border border-red-300 text-red-800 p-4 rounded space-y-2 overflow-x-auto">
-								<h4 className="font-semibold">❌ First Failed Test Case</h4>
+								<h4 className="font-semibold"> First Failed Test Case</h4>
 								<p>
 									<strong>Input:</strong> <code>{firstFailedCase.input}</code>
 								</p>
@@ -327,11 +362,11 @@ data = input().split()
 						</div>
 					</div>
 
-					<div className="border rounded overflow-hidden flex-1 min-h-0">
+					<div className="border rounded overflow-hidden flex-1 min-h-6">
 						<Editor
 							height="100%"
 							language={language}
-							theme="vs-light"
+							theme="vs-dark"
 							value={SampleCode}
 							onChange={(value) => setCode(value || "")}
 							options={{
@@ -449,7 +484,15 @@ data = input().split()
 									<>
 										<span className="text-2xl">❌</span>
 										<div>
-											<p className="font-bold">{verdict.result}</p>
+											<p className="font-bold">
+												{verdict.result === "TLE"
+													? "Time Limit Exceeded"
+													: verdict.result === "RE"
+													? "Runtime Error"
+													: verdict.result === "CLE"
+													? "Compilation Error"
+													: verdict.result}
+											</p>
 											<p className="text-sm">{verdict.failed} test case(s) failed</p>
 										</div>
 									</>
@@ -510,8 +553,8 @@ data = input().split()
 						<h2 className="text-4xl font-bold mb-8 text-gray-800 dark:text-white">AI Code Review</h2>
 
 						{/* Markdown Content */}
-						<div className="m-3 prose prose-lg dark:prose-invert max-h-[65vh] overflow-y-auto px-4 text-gray-700 dark:text-gray-200">
-							<ReactMarkdown>{AiReview}</ReactMarkdown>
+						<div className="m-3 prose-h2 prose-lg dark:prose-invert max-h-[65vh] overflow-y-auto px-4 text-gray-700 dark:text-gray-200">
+							<ReactMarkdown components={{ p: ({ children }) => <p className="mb-6">{children}</p> }}>{AiReview}</ReactMarkdown>
 						</div>
 					</div>
 				</div>

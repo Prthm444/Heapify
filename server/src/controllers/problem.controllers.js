@@ -62,6 +62,7 @@ export const getInputOutputPairsByProblemId = async (problemId) => {
 	return problem.testCases.map((tc) => ({
 		input: tc.input,
 		output: tc.output,
+		isPublic: tc.isPublic,
 	}));
 };
 
@@ -102,7 +103,7 @@ export const GetAiCodeReview = asyncHandler(async (req, res) => {
 
 		return res.status(200).json(new ApiResponse(200, { review: response }, "AI review generated successfully"));
 	} catch (error) {
-		console.error("[AI Review Error]:", error.message);
+		//console.error("[AI Review Error]:", error.message);
 		throw new ApiError(500, error.message || "Internal Server Error while generating AI review");
 	}
 });

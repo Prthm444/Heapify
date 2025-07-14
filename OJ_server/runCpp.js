@@ -28,6 +28,14 @@ const runCppWithUserInput = (filepath, userInput) => {
 
 			let stdout = "";
 			let stderr = "";
+			let timedOut = false;
+			let timeout = 5000;
+
+			// Kill the process if it runs too long
+			const timer = setTimeout(() => {
+				timedOut = true;
+				runProcess.kill("SIGKILL");
+			}, timeout);
 
 			// Write user input string to stdin
 			runProcess.stdin.write(userInput);
@@ -42,9 +50,17 @@ const runCppWithUserInput = (filepath, userInput) => {
 			});
 
 			runProcess.on("close", (code) => {
+				clearTimeout(timer);
 				// Cleanup files
 				fs.unlink(filepath, () => {});
 				fs.unlink(outPath, () => {});
+
+                if (timedOut) {
+					return resolve({
+						type: "Time Limit Exceeded",
+						error: `Time limit exit - Process killed after ${timeout}ms`,
+					});
+				}
 
 				if (code !== 0 || stderr) {
 					return resolve({

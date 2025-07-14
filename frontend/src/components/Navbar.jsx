@@ -32,7 +32,7 @@ const Navbar = () => {
 
 	return (
 		<>
-			<nav className="bg-white shadow w-full px-6 py-4 flex justify-between items-center">
+			<nav className="fixed top-0 left-0 right-0 z-50 bg-white/50 backdrop-blur-md shadow-md w-full px-6 py-4 flex justify-between items-center mb-4">
 				<h1 className="text-2xl font-bold text-blue-700">Heapify</h1>
 				<div className="flex gap-4 items-center">
 					<NavLink to="/submissions" className={navLinkClass}>

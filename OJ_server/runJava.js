@@ -17,6 +17,20 @@ const runJavaWithUserInput = (filepath, userInput) => {
 
 		let stdout = "";
 		let stderr = "";
+		let timedOut = false;
+		let timeout = 5000;
+
+		// Kill the process if it runs too long
+		const timer = setTimeout(() => {
+			timedOut = true;
+			runProcess.kill("SIGKILL");
+			fs.unlink(filepath, () => {});
+
+			return resolve({
+				type: "Time Limit Exceeded",
+				error: `Time limit exit java - Process killed after ${timeout}ms`,
+			});
+		}, timeout);
 
 		runProcess.stdin.write(userInput);
 		runProcess.stdin.end();
@@ -30,6 +44,11 @@ const runJavaWithUserInput = (filepath, userInput) => {
 		});
 
 		runProcess.on("close", (code) => {
+			clearTimeout(timer);
+
+			if (timedOut) {
+				return;
+			}
 			fs.unlink(filepath, () => {}); // cleanup .java file
 
 			if (code !== 0 || stderr) {

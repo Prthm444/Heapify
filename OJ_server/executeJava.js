@@ -42,7 +42,7 @@ const runJavaAgainstTestCases = async (filepath, testcases) => {
 					return resolve({ results, verdict });
 				}
 
-				const { input, output: expectedOutput } = testCases[index];
+				const { input, output: expectedOutput, isPublic } = testCases[index];
 
 				const startTime = process.hrtime();
 				const runProcess = spawn("java", [filepath], {
@@ -51,6 +51,19 @@ const runJavaAgainstTestCases = async (filepath, testcases) => {
 
 				let stdout = "";
 				let stderr = "";
+				let timedOut = false;
+				let timeout = 5000;
+
+				// Kill the process if it runs too long
+				const timer = setTimeout(() => {
+					timedOut = true;
+					runProcess.kill("SIGKILL");
+					fs.unlink(filepath, () => {});
+					console.log("heuyyy");
+					verdict.currentTestcase = index + 1;
+					verdict.result = "TLE";
+					return resolve({ results, verdict });
+				}, timeout);
 
 				runProcess.stdin.write(input);
 				runProcess.stdin.end();
@@ -66,19 +79,19 @@ const runJavaAgainstTestCases = async (filepath, testcases) => {
 				runProcess.on("close", (code) => {
 					const [seconds, nanoseconds] = process.hrtime(startTime);
 					const executionTime = seconds * 1000 + nanoseconds / 1e6;
-
+					clearTimeout(timer);
 					if (code !== 0 || stderr) {
 						fs.unlink(filepath, () => {});
 						verdict.currentTestcase = index + 1;
 						verdict.result = "RE";
 						return resolve({ results, verdict });
-					} else if (executionTime > 2000) {
+					} else if (executionTime > 3000) {
 						fs.unlink(filepath, () => {});
 						verdict.currentTestcase = index + 1;
 						verdict.result = "TLE";
 						return resolve({ results, verdict });
 					} else {
-						const actual = stdout.trim();
+						const actual = stdout.trim() || " ";
 						const passed = actual === expectedOutput.trim();
 						if (passed) {
 							verdict.passed += 1;
@@ -89,9 +102,9 @@ const runJavaAgainstTestCases = async (filepath, testcases) => {
 						}
 
 						results.push({
-							input,
-							expectedOutput,
-							actualOutput: actual,
+							input: isPublic ? input : "Hidden",
+							expectedOutput: isPublic ? expectedOutput : "Hidden",
+							actualOutput: isPublic ? actual : "Hidden",
 							status: passed ? "Passed" : "Failed",
 							executionTime,
 						});

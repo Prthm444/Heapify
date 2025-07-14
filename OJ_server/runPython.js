@@ -13,9 +13,18 @@ const runPythonWithUserInput = (filepath, userInput) => {
 	return new Promise((resolve, reject) => {
 		const pythonProcess = spawn("python", [filepath]);
 		//userInput += "\n";
-        //console.log(userInput)
+		//console.log(userInput)
 		let stdout = "";
 		let stderr = "";
+
+		let timedOut = false;
+		let timeout = 5000;
+
+		// Kill the process if it runs too long
+		const timer = setTimeout(() => {
+			timedOut = true;
+			pythonProcess.kill("SIGKILL");
+		}, timeout);
 
 		// Write user input string to stdin
 		pythonProcess.stdin.write(userInput);
@@ -24,7 +33,7 @@ const runPythonWithUserInput = (filepath, userInput) => {
 		pythonProcess.stdout.on("data", (data) => {
 			stdout += data.toString();
 		});
-        //console.log(stdout);
+		//console.log(stdout);
 		pythonProcess.stderr.on("data", (data) => {
 			stderr += data.toString();
 		});
@@ -32,6 +41,13 @@ const runPythonWithUserInput = (filepath, userInput) => {
 		pythonProcess.on("close", (code) => {
 			// Cleanup file
 			fs.unlink(filepath, () => {});
+            clearTimeout(timer);
+			if (timedOut) {
+				return resolve({
+					type: "Time Limit Exceeded",
+					error: `Time limit exit - Process killed after ${timeout}ms`,
+				});
+			}
 
 			if (code !== 0 || stderr) {
 				return resolve({
@@ -55,7 +71,6 @@ const runPythonWithUserInput = (filepath, userInput) => {
 		});
 	});
 };
-
 
 module.exports = {
 	runPythonWithUserInput,

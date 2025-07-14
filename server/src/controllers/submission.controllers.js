@@ -9,11 +9,12 @@ import { ApiError } from "../utils/Error.utils.js";
 
 export const AddNewSubmission = asyncHandler(async (req, res) => {
 	const { language = "cpp", code, problemId } = req.body;
+	//console.log("hello---------",code)
 	if (!problemId) throw new ApiError(401, "Problem Id not given");
 	const problem = await Problem.findById(problemId);
 	if (!problem) throw new ApiError(404, "Problem Not Found");
 	const ioPairs = await getInputOutputPairsByProblemId(problemId);
-	const OJ_output = await axios.post("http://127.0.0.1:7000/run", {
+	const OJ_output = await axios.post("http://localhost:7000/run", {
 		language,
 		code,
 		testcases: ioPairs,
@@ -73,13 +74,13 @@ export const getAllSubmissions = asyncHandler(async (req, res) => {
 
 export const RunCustomInput = asyncHandler(async (req, res) => {
 	const { code, language, customInput } = req.body;
-	//console.log(language);
+	//console.log(code);
 	try {
 		const result = await axios.post("http://localhost:7000/customrun", { code, language, customInput });
 		res.status(200).json(new ApiResponse(200, result.data, "Input ran successfully"));
-		console.log(result.data);
+		//console.log(result.data);
 	} catch (error) {
-		console.log("this is it :", error);
+		//console.log("this is it :", error);
 		throw new ApiError(401, "OJ server error");
 	}
 });
