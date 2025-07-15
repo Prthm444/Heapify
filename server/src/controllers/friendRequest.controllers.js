@@ -37,23 +37,12 @@ export const sendFriendRequest = asyncHandler(async (req, res) => {
 		fromUserId: req.user?._id,
 		toUserId: friend._id,
 	});
-	const createdFriendRequest = await FriendRequest.findById(
-		friendRequest._id
-	);
+	const createdFriendRequest = await FriendRequest.findById(friendRequest._id);
 	if (!createdFriendRequest) {
-		throw new ApiError(
-			500,
-			"Something went wrong during sending the friend request"
-		);
+		throw new ApiError(500, "Something went wrong during sending the friend request");
 	}
 
-	res.status(200).json(
-		new ApiResponse(
-			200,
-			createdFriendRequest,
-			"Successfully sent request!"
-		)
-	);
+	res.status(200).json(new ApiResponse(200, createdFriendRequest, "Successfully sent request!"));
 });
 
 export const getPendingFriendRequests = asyncHandler(async (req, res) => {
@@ -70,13 +59,7 @@ export const getPendingFriendRequests = asyncHandler(async (req, res) => {
 		return { username: req.fromUserId.username, requestId: req._id };
 	});
 
-	res.status(200).json(
-		new ApiResponse(
-			200,
-			usernames,
-			"Pending friend requests retrieved successfully"
-		)
-	);
+	res.status(200).json(new ApiResponse(200, usernames, "Pending friend requests retrieved successfully"));
 });
 
 export const acceptFriendRequest = asyncHandler(async (req, res) => {
@@ -84,14 +67,12 @@ export const acceptFriendRequest = asyncHandler(async (req, res) => {
 	if (!requestId) throw new ApiError(401, "cannot approve request");
 
 	const request = await FriendRequest.findById(requestId);
-	if (!request || request.status === "Rejected")
-		throw new ApiError(401, "cannot find request");
+	if (!request || request.status === "Rejected") throw new ApiError(401, "cannot find request");
 	console.log(request.toUserId, " ----- ", req.user._id);
 	if (request.toUserId.toString() !== req.user._id.toString()) {
 		throw new ApiError(401, "Request not authorized");
 	}
-	if (request.status === "Accepted")
-		throw new ApiError(401, "request already accepted");
+	if (request.status === "Accepted") throw new ApiError(401, "request already accepted");
 
 	const existingFriend = await User.exists({
 		_id: request.fromUserId,
@@ -108,17 +89,9 @@ export const acceptFriendRequest = asyncHandler(async (req, res) => {
 	try {
 		session.startTransaction();
 
-		await User.findByIdAndUpdate(
-			request.fromUserId,
-			{ $addToSet: { friends: request.toUserId } },
-			{ session }
-		);
+		await User.findByIdAndUpdate(request.fromUserId, { $addToSet: { friends: request.toUserId } }, { session });
 
-		await User.findByIdAndUpdate(
-			request.toUserId,
-			{ $addToSet: { friends: request.fromUserId } },
-			{ session }
-		);
+		await User.findByIdAndUpdate(request.toUserId, { $addToSet: { friends: request.fromUserId } }, { session });
 
 		await session.commitTransaction();
 		session.endSession();
@@ -132,9 +105,7 @@ export const acceptFriendRequest = asyncHandler(async (req, res) => {
 		validateBeforeSave: false,
 	});
 
-	res.status(200).json(
-		new ApiResponse(200, "Added friends , request accepted")
-	);
+	res.status(200).json(new ApiResponse(200, "Added friends , request accepted"));
 });
 
 export const rejectFriendRequest = asyncHandler(async (req, res) => {
@@ -142,11 +113,9 @@ export const rejectFriendRequest = asyncHandler(async (req, res) => {
 
 	const request = await FriendRequest.findById(requestId);
 
-	if (!request || request.status === "Rejected")
-		throw new ApiError(404, " cannot approve request");
+	if (!request || request.status === "Rejected") throw new ApiError(404, " cannot approve request");
 
-	if (request.fromUserId !== req.user._id)
-		throw new ApiError(401, "Request not authorized");
+	if (request.fromUserId !== req.user._id) throw new ApiError(401, "Request not authorized");
 
 	await request.deleteOne();
 
