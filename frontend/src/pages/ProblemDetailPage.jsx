@@ -10,6 +10,7 @@ import ReactMarkdown from "react-markdown";
 const ProblemDetailPage = () => {
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 	if (!isLoggedIn) return <Navigate to="/login" replace />;
+	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 	const { id } = useParams();
 	const [problem, setProblem] = useState(null);
@@ -68,7 +69,7 @@ data = input().split()
 
 	useEffect(() => {
 		const fetchProblem = async () => {
-			const res = await axios.get(`http://localhost:8001/problems/${id}`, {
+			const res = await axios.get(`${SERVER_URL}/problems/${id}`, {
 				withCredentials: true,
 			});
 			setProblem(res.data.data);
@@ -100,7 +101,7 @@ data = input().split()
 
 		try {
 			const res = await axios.post(
-				"http://localhost:8001/submissions/run",
+				`${SERVER_URL}/submissions/run`,
 				{
 					language,
 					code,
@@ -134,7 +135,7 @@ data = input().split()
 		const loadingToastAI = toast.loading("Getting Ai review...");
 		try {
 			const response = await axios.post(
-				"http://localhost:8001/problems/ai",
+				`${SERVER_URL}/problems/ai`,
 				{
 					code,
 					problem,
@@ -173,7 +174,7 @@ data = input().split()
 		const loadingToast = toast.loading("Loading...");
 		try {
 			const res = await axios.post(
-				"http://localhost:8001/submissions/new",
+				`${SERVER_URL}/submissions/new`,
 				{
 					language,
 					code,

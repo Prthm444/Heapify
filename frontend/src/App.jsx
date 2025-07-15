@@ -11,6 +11,7 @@ axios.defaults.withCredentials = true;
 import { ToastContainer } from "react-toastify";
 import AddProblemPage from "./pages/AddProblemPage";
 import MySubmissionsPage from "./pages/MySubmissionsPage";
+
 const router = createBrowserRouter([
 	{
 		path: "/",

@@ -41,6 +41,7 @@ const AddProblemPage = () => {
 
 	const [jsonInput, setJsonInput] = useState(JSON.stringify(exampleJSON, null, 2));
 	const [message, setMessage] = useState("");
+	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 	useEffect(() => {
 		if (message) toast.info(message);
@@ -59,7 +60,7 @@ const AddProblemPage = () => {
 				}
 			}
 			//console.log("Parsed JSON:", parsed);
-			const res = await axios.post("http://localhost:8001/problems/new", parsed, {
+			const res = await axios.post(`${SERVER_URL}/problems/new`, parsed, {
 				withCredentials: true,
 			});
 

@@ -9,11 +9,12 @@ export default function ProfilePage() {
 	const dispatch = useDispatch();
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 	const user = useSelector((state) => state.user.user);
+	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 	useEffect(() => {
 		const fetchInfo = async () => {
 			try {
-				const res = await axios.get("http://localhost:8001/user/info", { withCredentials: true });
+				const res = await axios.get(`${SERVER_URL}/user/info`, { withCredentials: true });
 				dispatch(setUser({ user: res.data.data }));
 			} catch (err) {
 				console.error("Error fetching user info:", err);

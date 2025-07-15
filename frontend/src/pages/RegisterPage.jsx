@@ -12,6 +12,7 @@ const RegisterPage = () => {
 		avatarUrl: "",
 	});
 	const navigate = useNavigate();
+	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 	const handleChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,7 +21,7 @@ const RegisterPage = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const res = await axios.post("http://localhost:8001/user/register", formData);
+			const res = await axios.post(`${SERVER_URL}/user/register`, formData);
 			alert("Registration successful ✅");
 			console.log(res.data);
 			navigate("/login");

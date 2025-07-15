@@ -8,14 +8,16 @@ const ProblemPage = () => {
 	const [problems, setProblems] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
-
+	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 	useEffect(() => {
+		console.log("URL: ------------- ", SERVER_URL);
 		const fetchProblems = async () => {
 			try {
-				const res = await axios.get("http://localhost:8001/problems/list", {
+				const res = await axios.get(`${SERVER_URL}/problems/list`, {
 					withCredentials: true,
 				});
 				setProblems(res.data.data);
+				//console.log(problems);
 			} catch (err) {
 				console.error(err);
 				setError("Failed to fetch problems.");

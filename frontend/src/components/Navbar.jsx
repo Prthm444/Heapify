@@ -11,13 +11,14 @@ const Navbar = () => {
 	const user = useSelector((state) => state.user.user);
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 	const [showLogoutModal, setShowLogoutModal] = useState(false);
+	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 	const navLinkClass = ({ isActive }) =>
 		`px-4 py-2 rounded-md font-medium transition ${isActive ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-200"}`;
 
 	const handleLogout = async () => {
 		try {
-			const logout = await axios.get("http://localhost:8001/user/logout", {
+			const logout = await axios.get(`${SERVER_URL}/user/logout`, {
 				withCredentials: true,
 			});
 			dispatch(clearUser());

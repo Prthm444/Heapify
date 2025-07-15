@@ -12,6 +12,7 @@ const LoginPage = () => {
 	const [formData, setFormData] = useState({ identifier: "", password: "" });
 	const [showPassword, setShowPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -25,7 +26,7 @@ const LoginPage = () => {
 		setIsLoading(true);
 		try {
 			const res = await axios.post(
-				"http://localhost:8001/user/login",
+				`${SERVER_URL}/user/login`,
 				{
 					username: formData.identifier,
 					email: formData.identifier,

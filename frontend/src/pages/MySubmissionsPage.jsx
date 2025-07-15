@@ -10,13 +10,14 @@ const MySubmissionsPage = () => {
 	const [submissions, setSubmissions] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 	if (!isLoggedIn) return <Navigate to="/login" replace />;
 
 	useEffect(() => {
 		const fetchSubmissions = async () => {
 			try {
-				const res = await axios.get("http://localhost:8001/submissions/all", {
+				const res = await axios.get(`${SERVER_URL}/submissions/all`, {
 					withCredentials: true,
 				});
 				setSubmissions(res.data.data || []);

@@ -7,11 +7,12 @@ import { useNavigate } from "react-router-dom";
 const useAuthCheck = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
+	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 	useEffect(() => {
 		const checkLogin = async () => {
 			try {
-				const res = await axios.get("http://localhost:8001/user/checklogin", {
+				const res = await axios.get(`${SERVER_URL}/user/checklogin`, {
 					withCredentials: true,
 				});
 				dispatch(setUser({ user: res.data.data }));
