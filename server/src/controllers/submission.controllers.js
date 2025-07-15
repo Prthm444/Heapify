@@ -14,7 +14,7 @@ export const AddNewSubmission = asyncHandler(async (req, res) => {
 	const problem = await Problem.findById(problemId);
 	if (!problem) throw new ApiError(404, "Problem Not Found");
 	const ioPairs = await getInputOutputPairsByProblemId(problemId);
-	const OJ_output = await axios.post("http://localhost:7000/run", {
+	const OJ_output = await axios.post(`http://${process.env.OJ_SERVER_IP}:7000/run`, {
 		language,
 		code,
 		testcases: ioPairs,
@@ -76,7 +76,7 @@ export const RunCustomInput = asyncHandler(async (req, res) => {
 	const { code, language, customInput } = req.body;
 	//console.log(code);
 	try {
-		const result = await axios.post("http://localhost:7000/customrun", { code, language, customInput });
+		const result = await axios.post(`http://${process.env.OJ_SERVER_IP}:7000/customrun`, { code, language, customInput });
 		res.status(200).json(new ApiResponse(200, result.data, "Input ran successfully"));
 		//console.log(result.data);
 	} catch (error) {

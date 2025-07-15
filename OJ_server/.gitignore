@@ -2,6 +2,8 @@ node_modules
 codes
 outputs
 .env
+Dockerfile
+.dockerignore
 
 # Logs
 logs
