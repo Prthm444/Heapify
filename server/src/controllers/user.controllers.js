@@ -86,6 +86,7 @@ const loginUser = asyncHandler(async (req, res) => {
 		httpOnly: true,
 		secure: true,
 		sameSite: "None",
+		path: "/",
 	};
 
 	//console.log(AccessToken);
@@ -114,6 +115,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 		httpOnly: true,
 		secure: true,
 		sameSite: "None",
+		path: "/",
 	};
 
 	return res.status(200).clearCookie("accessToken", options).clearCookie("refreshToken", options).json(new ApiResponse(200, {}, "User logged Out"));
