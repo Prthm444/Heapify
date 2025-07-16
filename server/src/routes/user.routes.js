@@ -14,14 +14,12 @@ router.route("/verifyUser").get(verifyJWT, (req, res) => {
 	res.status(200).send(new ApiResponse(200, req.user, "JWT middleware verified"));
 });
 
-router.route("/logout").get(verifyJWT, logoutUser);
+router.route("/logout").post(verifyJWT, logoutUser);
 
 router.route("/info").get(verifyJWT, getCurrentUserInfo);
 
 router.route("/userinfo/:username").get(getUserByUsername);
 
 router.route("/checkLogin").get(verifyJWT, checkLogin);
-
-
 
 export default router;

@@ -18,7 +18,7 @@ const Navbar = () => {
 
 	const handleLogout = async () => {
 		try {
-			const logout = await axios.get(`${SERVER_URL}/user/logout`, {
+			const logout = await axios.post(`${SERVER_URL}/user/logout`, {
 				withCredentials: true,
 			});
 			dispatch(clearUser());
