@@ -104,6 +104,7 @@ export const acceptFriendRequest = asyncHandler(async (req, res) => {
 	request.save({
 		validateBeforeSave: false,
 	});
+	console.log("yes");
 
 	res.status(200).json(new ApiResponse(200, "Added friends , request accepted"));
 });
