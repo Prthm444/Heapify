@@ -5,43 +5,8 @@ dotenv.config();
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function GetAiResposne(code, problem) {
-	console.log("problem given to ai : ", problem);
+	//console.log("problem given to ai : ", problem);
 	const prompt = `
-You are an expert coding assistant your job is understanding the problem json that i give u and reviewing user-submitted code .
-
-Review the following code:
-
-${code}
-
-Your response should  may include - you can skip some points if you feel they are obvious:
-
-1. Any potential issues or bugs in the logic or edge cases.
-2.  Suggestions for improving the code's performance, readability, or structure.
-
-3. If applicable, mention the language used and any language-specific improvements.
-4. be encouraging 
-
-Keep the feedback concise and clear. Do not include explanations for trivial or obvious parts.
-
-this was the question :
-
-${problem}
-
-
-
-You are talking to the user keep in mind. make sure you use markdown in the response to add extra extra spacing between points .
-
-`;
-
-	try {
-		const response = await ai.models.generateContent({
-			model: "gemini-2.5-flash",
-			contents: [
-				{
-					role: "user",
-					parts: [
-						{
-							text: `
 You are an expert coding assistant. Your task is to analyze the provided problem and the user-submitted code.
 
 Please generate a clear and structured markdown response with properly spaced paragraphs.
@@ -51,9 +16,8 @@ Please generate a clear and structured markdown response with properly spaced pa
 ### Problem:
 
 \`\`\`json
-${problem}
+${JSON.stringify(problem, null, 2)}
 \`\`\`
-
 ---
 
 ### Code:
@@ -80,7 +44,18 @@ Please follow this exact structure in your response:
 ---
 
 Use markdown formatting with clean, readable output. Do **not** use HTML. Paragraph spacing is important.
-`,
+`;
+	//console.log("prompt is ", prompt);
+
+	try {
+		const response = await ai.models.generateContent({
+			model: "gemini-2.5-flash",
+			contents: [
+				{
+					role: "user",
+					parts: [
+						{
+							text: prompt,
 						},
 					],
 				},
