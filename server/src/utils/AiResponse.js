@@ -5,7 +5,7 @@ dotenv.config();
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function GetAiResposne(code, problem) {
-	//console.log("problem given to ai : ", problem);
+	console.log("problem given to ai : ", problem);
 	const prompt = `
 You are an expert coding assistant your job is understanding the problem json that i give u and reviewing user-submitted code .
 
