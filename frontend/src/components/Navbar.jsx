@@ -34,7 +34,7 @@ const Navbar = () => {
 	return (
 		<>
 			<nav className="fixed top-0 left-0 right-0 z-50 bg-white/50 backdrop-blur-md shadow-md w-full px-6 py-4 flex justify-between items-center mb-4">
-				<h1 className="text-2xl font-bold text-blue-700">Heapify</h1>
+				<img src="/logo.png" alt="Heapify Logo" className="h-12 w-auto" />
 				<div className="flex gap-4 items-center">
 					<NavLink to="/problems" className={navLinkClass}>
 						Problems
