@@ -23,17 +23,17 @@ const RegisterPage = () => {
 		e.preventDefault();
 		try {
 			const res = await axios.post(`${SERVER_URL}/user/register`, formData);
-			toast.success("Registration successfull!")
+			toast.success("Registration successfull!");
 			console.log(res.data);
 			navigate("/login");
 		} catch (error) {
-			toast.error("Registration Failed..")
+			toast.error("Registration Failed..");
 			//console.error(error);
 		}
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 flex items-center justify-center p-6 relative">
+		<div className="min-h-screen  flex items-center justify-center p-6 relative">
 			{/* Background bubbles */}
 			<div className="absolute inset-0 overflow-hidden z-0">
 				<div className="absolute -top-40 -left-40 w-96 h-96 bg-purple-200 rounded-full opacity-20 blur-3xl animate-pulse"></div>

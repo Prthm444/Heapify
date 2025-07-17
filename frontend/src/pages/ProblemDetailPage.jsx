@@ -6,6 +6,7 @@ import { Navigate } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
+import { Loader } from "../components/Loader.jsx";
 
 const ProblemDetailPage = () => {
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
@@ -224,7 +225,7 @@ data = input().split()
 
 	const [SampleCode, setSampleCode] = useState(cppBoilerplate); // Initialize with C++ boilerplate
 
-	if (!problem) return <div className="p-6">Loading...</div>;
+	if (!problem) return <Loader />;
 
 	return (
 		<>

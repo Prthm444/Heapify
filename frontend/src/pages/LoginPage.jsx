@@ -47,16 +47,11 @@ const LoginPage = () => {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 flex items-center justify-center p-6 relative">
+		<div className="min-h-screen  flex items-center justify-center p-6 relative">
 			{/* Soft background bubbles */}
 
-			<div className="absolute inset-0 overflow-hidden z-0">
-				<div className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-200 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-				<div className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-200 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-			</div>
-
 			{/* Form container */}
-			<div className="relative z-10 bg-white/70 backdrop-blur-md shadow-xl rounded-2xl p-8 max-w-md w-full border border-white/30">
+			<div className="relative z-10 bg-white/70 backdrop-blur-md shadow-xl rounded-2xl p-8 max-w-md w-full border border-blue-400/20">
 				{/* Header */}
 				<div className="text-center mb-6">
 					<div className="mx-auto w-16 h-16 flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-md mb-3">
