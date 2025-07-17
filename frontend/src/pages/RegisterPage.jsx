@@ -119,20 +119,7 @@ const RegisterPage = () => {
 					</div>
 
 					{/* Avatar URL */}
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">Avatar URL (optional)</label>
-						<div className="relative">
-							<Image className="absolute top-3 left-3 w-5 h-5 text-gray-400" />
-							<input
-								type="text"
-								name="avatarUrl"
-								value={formData.avatarUrl}
-								onChange={handleChange}
-								placeholder="https://example.com/avatar.png"
-								className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white/90"
-							/>
-						</div>
-					</div>
+					
 
 					{/* Submit Button */}
 					<button
