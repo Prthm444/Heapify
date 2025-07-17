@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 import axios from "axios";
 import { setUser } from "../redux/slices/userSlice";
 import { User, Mail, Calendar, Users, Award, Code, Target, Languages, Shield, Edit } from "lucide-react";
+import { Loader } from "../components/Loader.jsx";
 
 export default function ProfilePage() {
 	const dispatch = useDispatch();
@@ -25,14 +26,7 @@ export default function ProfilePage() {
 
 	if (!isLoggedIn) return <Navigate to="/login" replace />;
 	if (!user) {
-		return (
-			<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
-				<div className="flex flex-col items-center space-y-4">
-					<div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-					<p className="text-gray-600 font-medium">Loading your profile...</p>
-				</div>
-			</div>
-		);
+		return <Loader />;
 	}
 
 	const getRoleColor = (role) => {
@@ -55,7 +49,7 @@ export default function ProfilePage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4">
+		<div className="min-h-screen ">
 			<div className="max-w-5xl mx-auto">
 				{/* Header Card */}
 				<div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">

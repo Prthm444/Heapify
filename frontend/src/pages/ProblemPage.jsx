@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { NavLink, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Loader } from "../components/Loader.jsx";
 
 const ProblemPage = () => {
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
@@ -52,9 +53,9 @@ const ProblemPage = () => {
 	if (!isLoggedIn) return <Navigate to="/login" replace />;
 
 	return (
-		<div className="min-h-screen px-6 py-10 bg-white text-gray-800">
+		<div className="min-h-screen px-6 py-10  text-gray-800">
 			<div className="max-w-6xl mx-auto">
-				<h1 className="text-4xl font-bold text-blue-800 mb-10 text-center">All Problems</h1>
+				{!loading && <h1 className="text-4xl font-bold text-blue-800 mb-10 text-center">All Problems</h1>}
 
 				<NavLink to="/add-problem">
 					<button className="fixed bottom-8 right-8 px-6 py-3 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base font-medium transition duration-200">
@@ -62,7 +63,7 @@ const ProblemPage = () => {
 					</button>
 				</NavLink>
 
-				{loading && <div className="text-center text-gray-500">Loading problems...</div>}
+				{loading && <Loader />}
 				{error && <p className="text-red-600 text-center">{error}</p>}
 
 				{problems.length > 0 && (

@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate, NavLink } from "react-router-dom";
 import { User, Lock, Mail, Info, Image, UserPlus, ArrowRight } from "lucide-react";
+import { toast } from "react-toastify";
 
 const RegisterPage = () => {
 	const [formData, setFormData] = useState({
@@ -22,12 +23,12 @@ const RegisterPage = () => {
 		e.preventDefault();
 		try {
 			const res = await axios.post(`${SERVER_URL}/user/register`, formData);
-			alert("Registration successful ✅");
+			toast.success("Registration successfull!")
 			console.log(res.data);
 			navigate("/login");
 		} catch (error) {
-			alert("Registration failed ❌ " + error.message);
-			console.error(error);
+			toast.error("Registration Failed..")
+			//console.error(error);
 		}
 	};
 

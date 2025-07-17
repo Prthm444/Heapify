@@ -3,6 +3,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "../redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const useAuthCheck = () => {
 	const dispatch = useDispatch();
@@ -16,11 +17,13 @@ const useAuthCheck = () => {
 					withCredentials: true,
 				});
 				dispatch(setUser({ user: res.data.data }));
-				console.log("already logged in...", res.data.data);
+				//console.log("already logged in...", res.data.data);
+				//toast.info("Already logged in..");
 				navigate("/problems");
 			} catch (err) {
 				dispatch(clearUser());
-				console.log("Not logged in");
+				//toast.info("You need to log in!");
+				//console.log("Not logged in");
 			}
 		};
 
