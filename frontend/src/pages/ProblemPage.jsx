@@ -9,6 +9,10 @@ const ProblemPage = () => {
 	const [problems, setProblems] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const user = useSelector((state) => state.user.user);
+	console.log("data ------- ", user?.email);
+	let userRole = user?.role;
+
 	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 	useEffect(() => {
 		console.log("URL: ------------- ", SERVER_URL);
@@ -57,11 +61,13 @@ const ProblemPage = () => {
 			<div className="max-w-6xl mx-auto">
 				{!loading && <h1 className="text-4xl font-bold text-blue-800 mb-10 text-center">All Problems</h1>}
 
-				<NavLink to="/add-problem">
-					<button className="fixed bottom-8 right-8 px-6 py-3 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base font-medium transition duration-200">
-						Add New Problem
-					</button>
-				</NavLink>
+				{userRole === "admin" && (
+					<NavLink to="/add-problem">
+						<button className="fixed bottom-8 right-8 px-6 py-3 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base font-medium transition duration-200">
+							Add New Problem
+						</button>
+					</NavLink>
+				)}
 
 				{loading && <Loader />}
 				{error && <p className="text-red-600 text-center">{error}</p>}

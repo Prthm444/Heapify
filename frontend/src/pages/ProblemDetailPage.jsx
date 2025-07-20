@@ -12,7 +12,7 @@ const ProblemDetailPage = () => {
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 	if (!isLoggedIn) return <Navigate to="/login" replace />;
 	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-
+   
 	const { id } = useParams();
 	const [problem, setProblem] = useState(null);
 	const [code, setCode] = useState("");
