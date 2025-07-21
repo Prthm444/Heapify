@@ -100,7 +100,7 @@ const MySubmissionsPage = () => {
 							</div>
 							<button
 								className=" my-4 px-4 py-2 rounded-md font-medium transition bg-blue-600 text-white "
-								onClick={() => setShowCode(showCode === "" ? submission._id : "")}
+								onClick={() => setShowCode(showCode === "" ? submission._id : showCode === submission._id ? "" : submission._id)}
 							>
 								{showCode === submission._id ? "Hide Code" : "Show Code"}
 							</button>
