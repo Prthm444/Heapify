@@ -10,12 +10,12 @@ const ProblemPage = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const user = useSelector((state) => state.user.user);
-	console.log("data ------- ", user?.email);
+	//console.log("data ------- ", user?.email);
 	let userRole = user?.role;
 
 	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 	useEffect(() => {
-		console.log("URL: ------------- ", SERVER_URL);
+		//console.log("URL: ------------- ", SERVER_URL);
 		const fetchProblems = async () => {
 			try {
 				const res = await axios.get(`${SERVER_URL}/problems/list`, {
