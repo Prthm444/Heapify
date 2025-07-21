@@ -11,7 +11,7 @@ const MySubmissionsPage = () => {
 	const [submissions, setSubmissions] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
-	const [showCode, setShowCode] = useState(false);
+	const [showCode, setShowCode] = useState("");
 	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 	if (!isLoggedIn) return <Navigate to="/login" replace />;
@@ -100,12 +100,12 @@ const MySubmissionsPage = () => {
 							</div>
 							<button
 								className=" my-4 px-4 py-2 rounded-md font-medium transition bg-blue-600 text-white "
-								onClick={() => setShowCode(!showCode)}
+								onClick={() => setShowCode(showCode === "" ? submission._id : "")}
 							>
-								{showCode ? "Hide Code" : "Show Code"}
+								{showCode === submission._id ? "Hide Code" : "Show Code"}
 							</button>
 
-							{showCode && submission.code && (
+							{showCode === submission._id && submission.code && (
 								<div className="mt-5">
 									<p className="text-sm font-medium text-gray-800 mb-2">Submitted Code:</p>
 									<SyntaxHighlighter

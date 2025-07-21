@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -10,9 +10,9 @@ import { Loader } from "../components/Loader.jsx";
 
 const ProblemDetailPage = () => {
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-	if (!isLoggedIn) return <Navigate to="/login" replace />;
+
 	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-   
+
 	const { id } = useParams();
 	const [problem, setProblem] = useState(null);
 	const [code, setCode] = useState("");
@@ -28,6 +28,8 @@ const ProblemDetailPage = () => {
 	const [showOutput, setShowOutput] = useState(true);
 	const [showAIModal, setShowAIModal] = useState(false);
 	const [AiReview, setAiReview] = useState("");
+
+	const navigate = useNavigate();
 
 	// Boilerplate codes
 	const cppBoilerplate = `#include <bits/stdc++.h>
@@ -90,6 +92,9 @@ data = input().split()
 	}, [language]);
 
 	const handleRunCode = async () => {
+		if (!isLoggedIn) {
+			return toast.error("Login to Run code");
+		}
 		setVerdict(null);
 		setFirstFailedCase(null);
 		if (!code.trim()) {
@@ -132,6 +137,9 @@ data = input().split()
 	};
 
 	const handleAI = async () => {
+		if (!isLoggedIn) {
+			return toast.error("Login to get AI review");
+		}
 		setIsSubmittingAI(true);
 		const loadingToastAI = toast.loading("Getting Ai review...");
 		try {
@@ -168,6 +176,9 @@ data = input().split()
 	};
 
 	const handleSubmit = async () => {
+		if (!isLoggedIn) {
+			return toast.error("Login to Submit code");
+		}
 		setVerdict(null);
 		setFirstFailedCase(null);
 		setIsSubmitting(true);

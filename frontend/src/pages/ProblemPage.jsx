@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { Loader } from "../components/Loader.jsx";
 
 const ProblemPage = () => {
-	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 	const [problems, setProblems] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -53,8 +52,6 @@ const ProblemPage = () => {
 				return "text-gray-600 bg-gray-50 border-gray-200";
 		}
 	};
-
-	if (!isLoggedIn) return <Navigate to="/login" replace />;
 
 	return (
 		<div className="min-h-screen px-6 py-10  text-gray-800">
