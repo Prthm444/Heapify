@@ -27,7 +27,9 @@ const RegisterPage = () => {
 			console.log(res.data);
 			navigate("/login");
 		} catch (error) {
-			toast.error("Registration Failed..");
+			toast.error(
+				error.status === 409 ? "Email or username already exists" : error.status === 400 ? "All fields are required! " : "Registration Failed.."
+			);
 			//console.error(error);
 		}
 	};
@@ -119,7 +121,6 @@ const RegisterPage = () => {
 					</div>
 
 					{/* Avatar URL */}
-					
 
 					{/* Submit Button */}
 					<button

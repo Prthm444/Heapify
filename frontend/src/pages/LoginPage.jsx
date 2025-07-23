@@ -39,8 +39,10 @@ const LoginPage = () => {
 
 			navigate("/problems");
 		} catch (error) {
-			toast.error(error.response?.data?.message || "Login failed. Please try again.");
-			console.error(error);
+			toast.error(
+				error.status === 404 ? "User not Registered" : error.status === 401 ? "Invalid User Credentials" : "Login failed. Please try again."
+			);
+			//console.error(error);
 		} finally {
 			setIsLoading(false);
 		}
