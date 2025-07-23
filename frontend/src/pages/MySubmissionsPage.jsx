@@ -5,6 +5,7 @@ import { Navigate, NavLink } from "react-router-dom";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { prism } from "react-syntax-highlighter/dist/esm/styles/prism"; // ✅ Light theme
 import { Loader } from "../components/Loader.jsx";
+import SubmissionsLoader from "../components/SubmissionsLoader.jsx";
 
 const MySubmissionsPage = () => {
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
@@ -59,11 +60,11 @@ const MySubmissionsPage = () => {
 
 	return (
 		<div className="p-6 max-w-6xl mx-auto">
-			{!loading && <h1 className="text-3xl font-bold text-blue-700 mb-6">My Submissions</h1>}
+			{!loading && submissions.length !== 0 && <h1 className="text-3xl font-bold text-blue-700 mb-6">My Submissions</h1>}
 
 			{loading && <Loader />}
 			{error && <p className="text-red-600">{error}</p>}
-			{submissions.length === 0 && !loading && !error && <p className="text-gray-600">No submissions yet</p>}
+			{submissions.length === 0 && !loading && !error && <SubmissionsLoader text="No Submissions yet" />}
 
 			{submissions.length > 0 && (
 				<div className="space-y-6">
