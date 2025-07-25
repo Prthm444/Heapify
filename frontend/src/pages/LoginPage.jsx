@@ -7,7 +7,7 @@ import useAuthCheck from "../hooks/useAuthcheck";
 import { User, Lock, Eye, EyeOff, ArrowRight, Shield } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 const LoginPage = () => {
-	useAuthCheck();
+	//useAuthCheck();
 
 	const [formData, setFormData] = useState({ identifier: "", password: "" });
 	const [showPassword, setShowPassword] = useState(false);

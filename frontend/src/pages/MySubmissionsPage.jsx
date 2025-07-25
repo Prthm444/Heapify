@@ -1,38 +1,61 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { Navigate, NavLink } from "react-router-dom";
+import { Navigate, NavLink, useNavigate } from "react-router-dom";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { prism } from "react-syntax-highlighter/dist/esm/styles/prism"; // ✅ Light theme
 import { Loader } from "../components/Loader.jsx";
 import SubmissionsLoader from "../components/SubmissionsLoader.jsx";
+import { toast } from "react-toastify";
 
 const MySubmissionsPage = () => {
-	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 	const [submissions, setSubmissions] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [showCode, setShowCode] = useState("");
 	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-
-	if (!isLoggedIn) return <Navigate to="/login" replace />;
-
+	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+	const navigate = useNavigate();
 	useEffect(() => {
-		const fetchSubmissions = async () => {
-			try {
-				const res = await axios.get(`${SERVER_URL}/submissions/all`, {
-					withCredentials: true,
-				});
-				setSubmissions(res.data.data || []);
-			} catch (err) {
-				console.error("Error fetching submissions:", err);
-				setError("Failed to load submissions.");
-			} finally {
-				setLoading(false);
-			}
-		};
-		fetchSubmissions();
-	}, []);
+		if (!isLoggedIn) {
+			//toast.error("Login to see your submissions");
+		} else {
+			// Only fetch submissions if logged in
+			const fetchSubmissions = async () => {
+				setLoading(true);
+				try {
+					const res = await axios.get(`${SERVER_URL}/submissions/all`, {
+						withCredentials: true,
+					});
+					setSubmissions(res.data.data || []);
+				} catch (err) {
+					setError("Failed to load submissions.");
+				} finally {
+					setLoading(false);
+				}
+			};
+			fetchSubmissions();
+		}
+	}, [isLoggedIn]);
+
+	if (!isLoggedIn) {
+		return (
+			<div className=" mt-20 flex flex-col items-center">
+				<h1 className="text-3xl m-5"> You are not Logged in </h1>
+				<button
+					onClick={() => {
+						navigate("/login");
+					}}
+					className="cursor-pointer bg-blue-600 shadow-[0px_4px_32px_0_rgba(99,102,241,.70)] px-6 py-3 rounded-xl border-[1px] border-slate-500 text-white font-medium group"
+				>
+					<div className="relative overflow-hidden">
+						<p className="group-hover:-translate-y-7 duration-[1.125s] ease-[cubic-bezier(0.19,1,0.22,1)]">Login</p>
+						<p className="absolute top-7 left-0 group-hover:top-0 duration-[1.125s] ease-[cubic-bezier(0.19,1,0.22,1)]">Login</p>
+					</div>
+				</button>
+			</div>
+		);
+	}
 
 	const formatDate = (date) =>
 		new Date(date).toLocaleString("en-IN", {

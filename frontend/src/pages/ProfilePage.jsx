@@ -1,30 +1,53 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setUser } from "../redux/slices/userSlice";
 import { User, Mail, Calendar, Users, Award, Code, Target, Languages, Shield, Edit } from "lucide-react";
 import { Loader } from "../components/Loader.jsx";
+import { toast } from "react-toastify";
+import SubmissionsLoader from "../components/SubmissionsLoader.jsx";
 
 export default function ProfilePage() {
 	const dispatch = useDispatch();
 	const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 	const user = useSelector((state) => state.user.user);
 	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-
+	const navigate = useNavigate();
 	useEffect(() => {
+		if (!isLoggedIn) {
+			//toast.error("Login to see your profile");
+			return;
+		}
 		const fetchInfo = async () => {
 			try {
 				const res = await axios.get(`${SERVER_URL}/user/info`, { withCredentials: true });
 				dispatch(setUser({ user: res.data.data }));
-			} catch (err) {
-				console.error("Error fetching user info:", err);
-			}
+				//console.log("called");
+			} catch {}
 		};
 		fetchInfo();
-	}, [dispatch]);
+	}, [isLoggedIn, dispatch, SERVER_URL]);
 
-	if (!isLoggedIn) return <Navigate to="/login" replace />;
+	if (!isLoggedIn) {
+		return (
+			<div className=" mt-20 flex flex-col items-center">
+				<h1 className="text-3xl m-5"> You are not Logged in </h1>
+				<button
+					onClick={() => {
+						navigate("/login");
+					}}
+					className="cursor-pointer bg-blue-600 shadow-[0px_4px_32px_0_rgba(99,102,241,.70)] px-6 py-3 rounded-xl border-[1px] border-slate-500 text-white font-medium group"
+				>
+					<div className="relative overflow-hidden">
+						<p className="group-hover:-translate-y-7 duration-[1.125s] ease-[cubic-bezier(0.19,1,0.22,1)]">Login</p>
+						<p className="absolute top-7 left-0 group-hover:top-0 duration-[1.125s] ease-[cubic-bezier(0.19,1,0.22,1)]">Login</p>
+					</div>
+				</button>
+			</div>
+		);
+	}
+
 	if (!user) {
 		return <Loader />;
 	}

@@ -11,6 +11,7 @@ axios.defaults.withCredentials = true;
 import { ToastContainer } from "react-toastify";
 import AddProblemPage from "./pages/AddProblemPage";
 import MySubmissionsPage from "./pages/MySubmissionsPage";
+import useAuthCheck from "./hooks/useAuthcheck";
 
 const router = createBrowserRouter([
 	{
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+	useAuthCheck();
 	return (
 		<>
 			<RouterProvider router={router} />;

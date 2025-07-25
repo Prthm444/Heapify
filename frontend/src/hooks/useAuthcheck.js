@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 
 const useAuthCheck = () => {
 	const dispatch = useDispatch();
-	const navigate = useNavigate();
+	//const navigate = useNavigate();
 	const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 	useEffect(() => {
@@ -19,16 +19,18 @@ const useAuthCheck = () => {
 				dispatch(setUser({ user: res.data.data }));
 				//console.log("already logged in...", res.data.data);
 				//toast.info("Already logged in..");
-				navigate("/problems");
+				//navigate("/problems");
 			} catch (err) {
 				dispatch(clearUser());
 				//toast.info("You need to log in!");
+				//navigate("/login");
 				//console.log("Not logged in");
 			}
 		};
 
 		checkLogin();
 	}, []);
+	return null;
 };
 
 export default useAuthCheck;
