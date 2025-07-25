@@ -203,8 +203,8 @@ data = input().split()
 
 			setShowModal(true);
 			toast.update(loadingToast, {
-				render: "Submitted successfully!",
-				type: "success",
+				render: failed ? "Submission Error" : "Submitted successfully!",
+				type: failed ? "error" : "success",
 				isLoading: false,
 				autoClose: 3000,
 			});
@@ -307,6 +307,8 @@ data = input().split()
 												? "Runtime Error"
 												: verdict.result === "CLE"
 												? "Compilation Error"
+												: verdict.result === "RJ"
+												? "Rejected"
 												: verdict.result}
 										</strong>{" "}
 										Some testcases failed
@@ -504,6 +506,8 @@ data = input().split()
 													? "Runtime Error"
 													: verdict.result === "CLE"
 													? "Compilation Error"
+													: verdict.result === "RJ"
+													? "Rejected"
 													: verdict.result}
 											</p>
 											<p className="text-sm">{verdict.failed} test case(s) failed</p>
