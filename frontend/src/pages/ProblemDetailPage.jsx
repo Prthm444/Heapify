@@ -203,8 +203,8 @@ data = input().split()
 
 			setShowModal(true);
 			toast.update(loadingToast, {
-				render: failed ? "Submission Error" : "Submitted successfully!",
-				type: failed ? "error" : "success",
+				render: verdict.result === "AC" ? "Submission Error" : "Submitted successfully!",
+				type: verdict.result === "AC" ? "error" : "success",
 				isLoading: false,
 				autoClose: 3000,
 			});
