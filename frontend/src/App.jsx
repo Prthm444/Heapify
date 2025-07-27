@@ -35,7 +35,7 @@ function App() {
 	useAuthCheck();
 	return (
 		<>
-			<RouterProvider router={router} />;
+			<RouterProvider router={router} />
 			<ToastContainer
 				position="bottom-right"
 				autoClose={3000}
